@@ -1,5 +1,8 @@
 mod interpreter;
+mod logger;
+
 use crate::interpreter::Rlox;
+use crate::logger::Logger;
 
 fn main() {
     println!("Hello, world!");
