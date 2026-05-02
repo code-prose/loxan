@@ -3,34 +3,43 @@ use std::io;
 use std::fs;
 
 #[allow(dead_code)]
-pub struct Rlox;
+pub struct Rlox {
+    had_error: bool
+}
 
 #[allow(dead_code)]
 impl Rlox {
-    pub fn main() ->  io::Result<()> {
+
+    pub fn new() -> Self {
+        Self { had_error: false }
+    }
+
+    pub fn main(&mut self) ->  io::Result<()> {
         let args: Vec<String> = env::args().collect();
 
         if args.len() > 1 {
               println!("Usage: jlox [script]");
               std::process::exit(64) 
         } else if args.len() == 1 {
-            Rlox::run_file(&args[0]).unwrap()
+            self.run_file(&args[0]).unwrap()
         } else {
-            Rlox::run_prompt().unwrap()
+            self.run_prompt().unwrap()
         }
         
         Ok(())
     }
 
-    fn run_file(path: &String) -> io::Result<()> {
+    fn run_file(&self, path: &String) -> io::Result<()> {
         let source = fs::read_to_string(path).unwrap();
         println!("{source:?}");
         Rlox::run(source);
 
+        if self.had_error { std::process::exit(65) }
+
         Ok(())
     }
 
-    fn run_prompt() -> io::Result<()> {
+    fn run_prompt(&mut self) -> io::Result<()> {
         let mut input = String::new();
         loop {
             println!("> ");
@@ -43,6 +52,7 @@ impl Rlox {
             };
             if input == "" { break }
             else { Rlox::run(input.clone()) };
+            self.had_error = false
         }
 
         Ok(())
