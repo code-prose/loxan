@@ -74,4 +74,8 @@ impl Token {
             line,
         }
     }
+
+    pub fn to_string(self) -> String {
+        String::from("{self.token_type} {self.lexeme} {literal}")
+    }
 }
