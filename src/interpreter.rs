@@ -2,6 +2,8 @@ use std::env;
 use std::io;
 use std::fs;
 
+use crate::tokens::{TokenType, Token, Literal};
+
 #[allow(dead_code)]
 pub struct Rlox {
     had_error: bool

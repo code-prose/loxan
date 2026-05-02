@@ -75,6 +75,8 @@ impl Token {
         }
     }
 
+    // is there a more idiomatic way to do this?
+    // trait? or something?
     pub fn to_string(self) -> String {
         String::from("{self.token_type} {self.lexeme} {literal}")
     }
