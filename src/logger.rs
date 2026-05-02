@@ -7,11 +7,11 @@ impl Logger {
     //     15 | function(first, second,);
     //                                ^-- Here.
 
-    pub fn report(line: i32, loc: String, message: String) {
+    pub fn report(line: usize, loc: String, message: String) {
         println!("[line {line}] Error {loc}: {message}");
     }
 
-    pub fn error(line: i32, message: String) {
+    pub fn error(line: usize, message: String) {
         Logger::report(line, String::from(""), message);
     }
 }
