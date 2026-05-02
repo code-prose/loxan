@@ -64,6 +64,7 @@ impl Scanner {
     }
 
     fn add_token(&mut self, token_type: TokenType, literal: Option<Literal>) {
-        todo!("")
+        let text: String = String::from_utf8_lossy(&self.source[self.start..self.current]).to_string();
+        self.tokens.push(Token::new(token_type, text, literal, self.line));
     }
 }
