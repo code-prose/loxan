@@ -3,6 +3,7 @@ use std::io;
 use std::fs;
 
 use crate::tokens::{TokenType, Token, Literal};
+use crate::scanner::Scanner;
 
 #[allow(dead_code)]
 pub struct Rlox {
@@ -61,12 +62,28 @@ impl Rlox {
 
     }
 
-    fn run(source: String) {
-        let scanner = Scanner::new(source);
-        let tokens: Vec<Token> = scanner.scanTokens();
+    fn run(&mut self, source: String) {
+        let mut scanner = Scanner::new(source);
+        let tokens: Vec<Token> = scanner.scan_tokens(self);
 
         for token in tokens.iter() {
             println!("{token}")
         }
     }
+
+    // Perhaps something like this in the future
+    // Error: Unexpected "," in argument list.
+    //
+    //     15 | function(first, second,);
+    //                                ^-- Here.
+    pub fn report(&mut self, line: usize, loc: String, message: String) {
+        println!("[line {line}] Error {loc}: {message}");
+        self.had_error = true;
+    }
+
+    pub fn error(&mut self, line: usize, message: String) {
+        self.report(line, String::from(""), message);
+    }
+
+
 }
