@@ -1,4 +1,5 @@
 use crate::tokens::{Literal, Token, TokenType};
+use crate::interpreter::Rlox;
 
 pub struct Scanner {
     source: Vec<u8>,
@@ -19,10 +20,10 @@ impl Scanner {
         }
     }
 
-    pub fn scan_tokens(&mut self) -> Vec<Token> {
+    pub fn scan_tokens(&mut self, interp: &mut Rlox) -> Vec<Token> {
         while !self.is_at_end() {
             self.start = self.current;
-            self.scan_token();
+            self.scan_token(interp);
         }
         // figure this out
         self.tokens.push(Token::new(
@@ -38,7 +39,7 @@ impl Scanner {
         self.current >= self.source.len()
     }
 
-    fn scan_token(&mut self) {
+    fn scan_token(&mut self, interp: &mut Rlox) {
         let character: char = self.advance();
         match character {
             '(' => self.add_token(TokenType::RightParen, None),
@@ -51,7 +52,9 @@ impl Scanner {
             '+' => self.add_token(TokenType::Plus, None),
             ';' => self.add_token(TokenType::Semicolon, None),
             '*' => self.add_token(TokenType::Star, None),
-            _ => std::process::exit(100),
+            _ => {
+                Rlox::error(interp, self.line, String::from("Unexpected character: {character}"));
+            },
         };
 
         todo!("")
