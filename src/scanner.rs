@@ -151,12 +151,12 @@ impl Scanner {
         let slice = (&self.source[self.start..self.current]).clone().to_vec();
         let text = String::from_utf8(slice).unwrap();
 
-        let _token: TokenType = match KEYWORDS.get(&text) {
+        let token: TokenType = match KEYWORDS.get(&text) {
             Some(t) => t.clone(),
             None => TokenType::Identifier
         };
 
-        self.add_token(TokenType::Identifier, None);
+        self.add_token(token, None);
     }
 
     fn peek(&mut self) -> char {
