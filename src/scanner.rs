@@ -76,7 +76,13 @@ impl Scanner {
                 } else {
                     self.add_token(TokenType::Slash, None)
                 }
-            }
+            },
+            ' ' => {},
+            '\t' => {},
+            '\r' => {},
+            '\n' => {
+                self.line += 1;
+            },
             _ => {
                 Rlox::error(interp, self.line, String::from("Unexpected character: {character}"));
             },
