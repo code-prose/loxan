@@ -52,12 +52,56 @@ impl Scanner {
             '+' => self.add_token(TokenType::Plus, None),
             ';' => self.add_token(TokenType::Semicolon, None),
             '*' => self.add_token(TokenType::Star, None),
+            '!' => {
+                let t = if self.match_token('=') { TokenType::BangEqual } else { TokenType::Bang };
+                self.add_token(t, None);
+            },
+            '=' => {
+                let t = if self.match_token('=') { TokenType::EqualEqual } else { TokenType::Equal };
+                self.add_token(t, None);
+            },
+            '>' => {
+                let t = if self.match_token('=') { TokenType::GreaterEqual } else { TokenType::Greater };
+                self.add_token(t, None);
+            },
+            '<' => {
+                let t = if self.match_token('=') { TokenType::LessEqual } else { TokenType::Less };
+                self.add_token(t, None);
+            },
+            '/' => {
+                if self.match_token('/') {
+                    while self.peek() != '\n' && !self.is_at_end() {
+                        self.advance();
+                    }
+                } else {
+                    self.add_token(TokenType::Slash, None)
+                }
+            }
             _ => {
                 Rlox::error(interp, self.line, String::from("Unexpected character: {character}"));
             },
         };
 
         todo!("")
+    }
+
+    fn peek(&mut self) -> char {
+        if self.is_at_end() {
+            return '\0'
+        } else {
+            self.source[self.current] as char
+        }
+    }
+
+    fn match_token(&mut self, expected: char) -> bool {
+        if self.is_at_end() {
+            false
+        } else if self.source[self.current] as char != expected {
+            false
+        } else {
+            self.current += 1;
+            true
+        }
     }
 
     fn advance(&mut self) -> char {
