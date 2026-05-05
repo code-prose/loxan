@@ -85,9 +85,16 @@ impl Scanner {
                 self.line += 1;
             },
             '"' => self.string(interp),
+            'o' => {
+                if self.match_token('r') {
+                    self.add_token(TokenType::Or, None);
+                }
+            },
             _ => {
                 if self.is_digit(character) {
                     self.number();
+                } else if self.is_alpha(character) {
+                    self.identifier();
                 } else {
                     Rlox::error(interp, self.line, String::from("Unexpected character: {character}"));
                 }
@@ -95,6 +102,26 @@ impl Scanner {
         };
 
         todo!("")
+    }
+
+    fn is_alpha(&mut self, c: char) -> bool {
+        return (c >= 'a' && c <= 'z') ||
+               (c >= 'A' && c <= 'Z') ||
+                c == '_'
+    }
+
+    fn is_alphanumeric(&mut self, c: char) -> bool {
+        return self.is_alpha(c) || self.is_digit(c)
+    }
+
+    fn identifier(&mut self) {
+        let _c = self.peek();
+        while self.is_alpha(_c) {
+            self.advance();
+            let _c = self.peek();
+        }
+
+        self.add_token(TokenType::Identifier, None);
     }
 
     fn peek(&mut self) -> char {
