@@ -1,5 +1,32 @@
+use std::collections::HashMap;
+use std::sync::LazyLock;
+
 use crate::tokens::{Literal, Token, TokenType};
 use crate::interpreter::Rlox;
+
+
+static KEYWORDS: LazyLock<HashMap<String, TokenType>> = LazyLock::new(|| {
+    let mut map = HashMap::new();
+
+    map.insert(String::from("and"),    TokenType::And);
+    map.insert(String::from("class"),  TokenType::Class);
+    map.insert(String::from("else"),   TokenType::Else);
+    map.insert(String::from("false"),  TokenType::False);
+    map.insert(String::from("for"),    TokenType::For);
+    map.insert(String::from("fun"),    TokenType::Fun);
+    map.insert(String::from("if"),     TokenType::If);
+    map.insert(String::from("nil"),    TokenType::Nil);
+    map.insert(String::from("or"),     TokenType::Or);
+    map.insert(String::from("print"),  TokenType::Print);
+    map.insert(String::from("return"), TokenType::Return);
+    map.insert(String::from("super"),  TokenType::Super);
+    map.insert(String::from("this"),   TokenType::This);
+    map.insert(String::from("true"),   TokenType::True);
+    map.insert(String::from("var"),    TokenType::Var);
+    map.insert(String::from("while"),  TokenType::While);
+
+    map
+});
 
 pub struct Scanner {
     source: Vec<u8>,
@@ -135,6 +162,7 @@ impl Scanner {
     fn is_digit(&mut self, c: char) -> bool {
         return c >= '0' && c <= '9'
     }
+
 
     fn number(&mut self) {
         let _c = self.peek();
