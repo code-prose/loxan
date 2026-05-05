@@ -85,7 +85,11 @@ impl Scanner {
             },
             '"' => self.string(interp),
             _ => {
-                Rlox::error(interp, self.line, String::from("Unexpected character: {character}"));
+                if self.is_digit(character) {
+                    self.number();
+                } else {
+                    Rlox::error(interp, self.line, String::from("Unexpected character: {character}"));
+                }
             },
         };
 
@@ -97,6 +101,46 @@ impl Scanner {
             return '\0'
         } else {
             self.source[self.current] as char
+        }
+    }
+
+    fn is_digit(&mut self, c: char) -> bool {
+        return c >= '0' && c <= '9'
+    }
+
+    fn number(&mut self) {
+        let _c = self.peek();
+        while self.is_digit(_c) {
+            self.advance();
+            let _c = self.peek();
+        }
+        let next = self.peek_next();
+
+        if self.peek() == '.' && self.is_digit(next) {
+            self.advance();
+
+            let _c = self.peek();
+            while self.is_digit(_c) {
+                self.advance();
+                let _c = self.peek();
+            }
+        }
+
+        let slice = (&self.source[self.start..self.current]).clone().to_vec();
+        let temp_string = String::from_utf8(slice).unwrap();
+        let value = Some(
+            Literal::Number(str::parse::<f64>(&temp_string).unwrap())
+        );
+
+        self.add_token(TokenType::Number, value);
+
+    }
+
+    fn peek_next(&mut self) -> char {
+        if self.current + 1 >= self.source.len() {
+            return '\0'
+        } else {
+            return self.source[self.current + 1] as char
         }
     }
 
