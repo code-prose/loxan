@@ -25,13 +25,14 @@ impl Scanner {
             self.start = self.current;
             self.scan_token(interp);
         }
-        // figure this out
+
         self.tokens.push(Token::new(
             TokenType::EOF,
             String::from(""),
             Some(Literal::Nil),
             self.line,
         ));
+
         self.tokens.clone()
     }
 
