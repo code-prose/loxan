@@ -83,6 +83,7 @@ impl Scanner {
             '\n' => {
                 self.line += 1;
             },
+            '"' => self.string(interp),
             _ => {
                 Rlox::error(interp, self.line, String::from("Unexpected character: {character}"));
             },
@@ -97,6 +98,30 @@ impl Scanner {
         } else {
             self.source[self.current] as char
         }
+    }
+
+    fn string(&mut self, interp: &mut Rlox) {
+        while self.peek() != '"' && !self.is_at_end() {
+            if self.peek() == '\n' {
+                self.line += 1;
+            }
+            self.advance();
+        }
+
+        if self.is_at_end() {
+            Rlox::error(interp, self.line, String::from("Unterminated string."));
+            return
+        }
+
+        self.advance();
+
+        let slice = (&self.source[self.start - 1..self.current + 1]).clone();
+        let value = Some(
+            Literal::Str(
+                String::from_utf8(slice.to_vec()).unwrap()
+            )
+        );
+        self.add_token(TokenType::String, value);
     }
 
     fn match_token(&mut self, expected: char) -> bool {
