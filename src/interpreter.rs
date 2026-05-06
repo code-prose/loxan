@@ -32,10 +32,10 @@ impl Rlox {
         Ok(())
     }
 
-    fn run_file(&self, path: &String) -> io::Result<()> {
+    fn run_file(&mut self, path: &String) -> io::Result<()> {
         let source = fs::read_to_string(path).unwrap();
         println!("{source:?}");
-        Rlox::run(source);
+        Rlox::run(self, source);
 
         if self.had_error { std::process::exit(65) }
 
@@ -54,7 +54,7 @@ impl Rlox {
                 }
             };
             if input == "" { break }
-            else { Rlox::run(input.clone()) };
+            else { Rlox::run(self, input.clone()) };
             self.had_error = false
         }
 
@@ -67,7 +67,7 @@ impl Rlox {
         let tokens: Vec<Token> = scanner.scan_tokens(self);
 
         for token in tokens.iter() {
-            println!("{token}")
+            println!("{token:?}")
         }
     }
 
