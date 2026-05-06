@@ -104,7 +104,7 @@ impl Scanner {
                 } else if self.match_token('*') {
                     while !self.is_at_end() {
                         self.advance();
-                        if self.peek() == '*' && self.peek_next() == '\\' {
+                        if self.peek() == '*' && self.peek_next() == '/' {
                             self.advance();
                             self.advance();
                             break
@@ -312,7 +312,16 @@ mod tests {
     #[test]
     fn test_scan_c_style_comments() {
         let mut rlox = Rlox::new();
-        let mut scanner = Scanner::new("/* 123 testing\n 456 test?*\\\n var\n".to_string());
+        let mut scanner = Scanner::new("/* 123 testing\n 456 test?*/\n var\n".to_string());
+        let _ = scanner.scan_tokens(&mut rlox);
+
+        assert!(!rlox.had_error);
+    }
+
+    #[test]
+    fn test_scan_nested_c_style_comments() {
+        let mut rlox = Rlox::new();
+        let mut scanner = Scanner::new("/* 123 /*testing\n 456*/ test?*/\n var\n".to_string());
         let _ = scanner.scan_tokens(&mut rlox);
 
         assert!(!rlox.had_error);
