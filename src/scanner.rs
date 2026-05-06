@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::LazyLock;
 
-use crate::tokens::{Literal, Token, TokenType};
+use crate::tokens::{Literal, Token, TokenType, NestedToken};
 use crate::interpreter::Rlox;
 
 
@@ -30,6 +30,7 @@ static KEYWORDS: LazyLock<HashMap<String, TokenType>> = LazyLock::new(|| {
 
 pub struct Scanner {
     source: Vec<u8>,
+    nesting_stack: Vec<NestedToken>,
     tokens: Vec<Token>,
     start: usize,
     current: usize,
@@ -41,6 +42,7 @@ impl Scanner {
         Self {
             source: source.into_bytes(),
             tokens: Vec::new(),
+            nesting_stack: Vec::new(),
             start: 0,
             current: 0,
             line: 1,
@@ -79,7 +81,17 @@ impl Scanner {
             '-' => self.add_token(TokenType::Minus, None),
             '+' => self.add_token(TokenType::Plus, None),
             ';' => self.add_token(TokenType::Semicolon, None),
-            '*' => self.add_token(TokenType::Star, None),
+            '*' => {
+                if self.match_token('/') {
+                    let to_match = self.nesting_stack.pop().unwrap();
+                    if to_match != NestedToken::CStyleComment {
+                        Rlox::error(interp, self.line, format!("Unexpected token: */"));
+                        
+                    }
+                } else {
+                    self.add_token(TokenType::Star, None)
+                }
+            },
             '!' => {
                 let t = if self.match_token('=') { TokenType::BangEqual } else { TokenType::Bang };
                 self.add_token(t, None);
@@ -102,14 +114,7 @@ impl Scanner {
                         self.advance();
                     }
                 } else if self.match_token('*') {
-                    while !self.is_at_end() {
-                        self.advance();
-                        if self.peek() == '*' && self.peek_next() == '/' {
-                            self.advance();
-                            self.advance();
-                            break
-                        }
-                    }
+                    self.nesting_stack.push(NestedToken::CStyleComment);
                 } else {
                     self.add_token(TokenType::Slash, None)
                 }
@@ -251,11 +256,9 @@ impl Scanner {
     }
 
     fn advance(&mut self) -> char {
-        let character = self.source[self.current] as char;
-        let curr = self.current;
-        println!("{curr}: {character}");
+        let character = self.source[self.current];
         self.current += 1;
-        character
+        character as char
     }
 
     fn add_token(&mut self, token_type: TokenType, literal: Option<Literal>) {
