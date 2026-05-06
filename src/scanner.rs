@@ -101,6 +101,15 @@ impl Scanner {
                     while self.peek() != '\n' && !self.is_at_end() {
                         self.advance();
                     }
+                } else if self.match_token('*') {
+                    while !self.is_at_end() {
+                        self.advance();
+                        if self.peek() == '*' && self.peek_next() == '\\' {
+                            self.advance();
+                            self.advance();
+                            break
+                        }
+                    }
                 } else {
                     self.add_token(TokenType::Slash, None)
                 }
@@ -123,7 +132,7 @@ impl Scanner {
                 } else if self.is_alpha(character) {
                     self.identifier();
                 } else {
-                    Rlox::error(interp, self.line, String::from("Unexpected character: {character}"));
+                    Rlox::error(interp, self.line, format!("Unexpected character: {character}"));
                 }
             },
         };
@@ -298,5 +307,14 @@ mod tests {
         let tokens = scanner.scan_tokens(&mut rlox);
 
         assert_eq!(tokens[0].token_type, TokenType::Identifier);
+    }
+
+    #[test]
+    fn test_scan_c_style_comments() {
+        let mut rlox = Rlox::new();
+        let mut scanner = Scanner::new("/* 123 testing\n 456 test?*\\\n var\n".to_string());
+        let _ = scanner.scan_tokens(&mut rlox);
+
+        assert!(!rlox.had_error);
     }
 }

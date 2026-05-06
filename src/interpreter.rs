@@ -9,7 +9,7 @@ use crate::scanner::Scanner;
 
 #[allow(dead_code)]
 pub struct Rlox {
-    had_error: bool
+    pub had_error: bool
 }
 
 #[allow(dead_code)]
