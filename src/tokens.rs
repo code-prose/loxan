@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     // Single-character tokens
     LeftParen,
@@ -49,7 +49,8 @@ pub enum TokenType {
     EOF,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
+#[allow(dead_code)]
 pub enum Literal {
     Str(String),
     Number(f64),
@@ -57,12 +58,13 @@ pub enum Literal {
     Nil,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
+#[allow(dead_code)]
 pub struct Token {
-    token_type: TokenType,
-    lexeme: String,
-    literal: Option<Literal>,
-    line: usize,
+    pub token_type: TokenType,
+    pub lexeme: String,
+    pub literal: Option<Literal>,
+    pub line: usize,
 }
 
 impl Token {
@@ -77,6 +79,7 @@ impl Token {
 
     // is there a more idiomatic way to do this?
     // trait? or something?
+    #[allow(dead_code)]
     pub fn to_string(self) -> String {
         String::from("{self.token_type} {self.lexeme} {literal}")
     }

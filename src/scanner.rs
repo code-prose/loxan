@@ -254,3 +254,49 @@ impl Scanner {
         self.tokens.push(Token::new(token_type, text, literal, self.line));
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tokens::TokenType;
+    use crate::interpreter::Rlox;
+
+    #[test]
+    fn test_scan_number() {
+        let mut rlox = Rlox::new();
+        let mut scanner = Scanner::new("123".to_string());
+        let tokens = scanner.scan_tokens(&mut rlox);
+
+        assert_eq!(tokens[0].token_type, TokenType::Number);
+
+    }
+
+    #[test]
+    fn test_scan_str() {
+        let mut rlox = Rlox::new();
+        let mut scanner = Scanner::new("\"123\"".to_string());
+        let tokens = scanner.scan_tokens(&mut rlox);
+
+        assert_eq!(tokens[0].token_type, TokenType::String);
+        assert!(matches!(&tokens[0].literal, Some(Literal::Str(s)) if s == "123"));
+
+    }
+
+    #[test]
+    fn test_scan_keyword() {
+        let mut rlox = Rlox::new();
+        let mut scanner = Scanner::new("var".to_string());
+        let tokens = scanner.scan_tokens(&mut rlox);
+
+        assert_eq!(tokens[0].token_type, TokenType::Var);
+    }
+
+    #[test]
+    fn test_scan_identifier() {
+        let mut rlox = Rlox::new();
+        let mut scanner = Scanner::new("variable_name".to_string());
+        let tokens = scanner.scan_tokens(&mut rlox);
+
+        assert_eq!(tokens[0].token_type, TokenType::Identifier);
+    }
+}
