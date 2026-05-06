@@ -1,6 +1,6 @@
 use std::env;
-use std::io;
 use std::fs::File;
+use std::io;
 use std::io::prelude::*;
 
 pub struct GenerateAst;
@@ -36,10 +36,44 @@ impl GenerateAst {
         file.write_all(b"use crate::tokens::{Token, TokenType, Literal}\n")?;
         file.write_all(b"\n")?;
 
-        let class_name = format!("enum {base_name} {{\n").into_bytes();
-        file.write_all(&class_name)?;
-        file.write_all(b"}\n")?;
+        // start enum
+        let base_enum_name = format!("enum {base_name} {{\n").into_bytes();
+        file.write_all(&base_enum_name)?;
 
+        // expr defs
+        for expr_type in expression_types {
+            let mut enum_name_iter = expr_type.split_terminator(':');
+            let enum_name = match enum_name_iter.next() {
+                Some(v) => v,
+                None => {
+                    println!("Failed to generate AST from expr vec");
+                    std::process::exit(65)
+                }
+            };
+
+            let enum_fields = match enum_name_iter.next() {
+                Some(v) => v,
+                None => {
+                    println!("Failed to generate AST from expr vec");
+                    std::process::exit(65)
+                }
+            };
+            let enum_fields = String::from_utf8(enum_fields.into<Vec<_>>());
+
+            self.define_type(&mut file, String::from_utf8(base_enum_name)?, enum_name.to_string(), enum_fields.to_string());
+        }
+
+        file.write_all(b"}\n")?;
+        Ok(())
+    }
+
+    fn define_type(
+        &mut self,
+        file: &mut std::fs::File,
+        base_enum_name: String,
+        enum_name: String,
+        enum_fields: String,
+    ) {
         todo!("")
     }
 }
