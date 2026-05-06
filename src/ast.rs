@@ -37,8 +37,9 @@ impl GenerateAst {
         file.write_all(b"\n")?;
 
         // start enum
-        let base_enum_name = format!("enum {base_name} {{\n").into_bytes();
-        file.write_all(&base_enum_name)?;
+        let base_enum_name = format!("enum {base_name} {{\n");
+        let base_enum_name_bytes = base_enum_name.clone().into_bytes();
+        file.write_all(&base_enum_name_bytes)?;
 
         // expr defs
         for expr_type in expression_types {
@@ -49,7 +50,8 @@ impl GenerateAst {
                     println!("Failed to generate AST from expr vec");
                     std::process::exit(65)
                 }
-            };
+            }
+            .to_string();
 
             let enum_fields = match enum_name_iter.next() {
                 Some(v) => v,
@@ -57,10 +59,10 @@ impl GenerateAst {
                     println!("Failed to generate AST from expr vec");
                     std::process::exit(65)
                 }
-            };
-            let enum_fields = String::from_utf8(enum_fields.into<Vec<_>>());
+            }
+            .to_string();
 
-            self.define_type(&mut file, String::from_utf8(base_enum_name)?, enum_name.to_string(), enum_fields.to_string());
+            self.define_type(&mut file, &base_enum_name, enum_name, enum_fields);
         }
 
         file.write_all(b"}\n")?;
@@ -70,7 +72,7 @@ impl GenerateAst {
     fn define_type(
         &mut self,
         file: &mut std::fs::File,
-        base_enum_name: String,
+        base_enum_name: &String,
         enum_name: String,
         enum_fields: String,
     ) {
