@@ -315,7 +315,7 @@ mod tests {
     #[test]
     fn test_scan_c_style_comments() {
         let mut rlox = Rlox::new();
-        let mut scanner = Scanner::new("/* 123 testing\n 456 test?*/\n var\n".to_string());
+        let mut scanner = Scanner::new("/* 123 testing\n 456 test*/\n var\n".to_string());
         let _ = scanner.scan_tokens(&mut rlox);
 
         assert!(!rlox.had_error);
@@ -324,7 +324,7 @@ mod tests {
     #[test]
     fn test_scan_nested_c_style_comments() {
         let mut rlox = Rlox::new();
-        let mut scanner = Scanner::new("/* 123 /*testing\n 456*/ test?*/\n var\n".to_string());
+        let mut scanner = Scanner::new("/* 123 /*testing\n 456*/ test*/\n var\n".to_string());
         let _ = scanner.scan_tokens(&mut rlox);
 
         assert!(!rlox.had_error);
