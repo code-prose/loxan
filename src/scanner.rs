@@ -221,7 +221,7 @@ impl Scanner {
 
         self.advance();
 
-        let slice = &self.source[self.start - 1..self.current + 1];
+        let slice = &self.source[self.start + 1..self.current - 1];
         let value = Some(
             Literal::Str(
                 String::from_utf8(slice.to_vec()).unwrap()
