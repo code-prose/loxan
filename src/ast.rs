@@ -1,5 +1,7 @@
-use std::io;
 use std::env;
+use std::io;
+use std::fs::File;
+use std::io::prelude::*;
 
 pub struct GenerateAst;
 
@@ -18,13 +20,26 @@ impl GenerateAst {
         expr_array.push("Literal  : Object value".to_string());
         expr_array.push("Unary    : Token operator, Expr right".to_string());
 
-
-        self.define_ast(output_dir, String::from("Expr"), expr_array);
+        let _res = self.define_ast(output_dir, String::from("Expr"), expr_array);
 
         Ok(())
     }
 
-    fn define_ast(&mut self, output_dir: String, base_name: String, expression_types: Vec<String>) {
+    fn define_ast(
+        &mut self,
+        output_dir: String,
+        base_name: String,
+        expression_types: Vec<String>,
+    ) -> io::Result<()> {
+        let path = format!("{output_dir}/{base_name}.rs");
+        let mut file = File::create(path)?;
+        file.write_all(b"use crate::tokens::{Token, TokenType, Literal}\n")?;
+        file.write_all(b"\n")?;
+
+        let class_name = format!("enum {base_name} {{\n").into_bytes();
+        file.write_all(&class_name)?;
+        file.write_all(b"}\n")?;
+
         todo!("")
     }
 }
