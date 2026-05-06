@@ -127,8 +127,6 @@ impl Scanner {
                 }
             },
         };
-
-        todo!("")
     }
 
     fn is_alpha(&mut self, c: char) -> bool {
@@ -142,10 +140,10 @@ impl Scanner {
     }
 
     fn identifier(&mut self) {
-        let _c = self.peek();
-        while self.is_alpha(_c) {
+        let mut c = self.peek();
+        while self.is_alphanumeric(c) {
             self.advance();
-            let _c = self.peek();
+            c = self.peek();
         }
 
         let slice = (&self.source[self.start..self.current]).to_vec();
@@ -173,20 +171,20 @@ impl Scanner {
 
 
     fn number(&mut self) {
-        let _c = self.peek();
-        while self.is_digit(_c) {
+        let mut c = self.peek();
+        while self.is_digit(c) {
             self.advance();
-            let _c = self.peek();
+            c = self.peek();
         }
         let next = self.peek_next();
 
         if self.peek() == '.' && self.is_digit(next) {
             self.advance();
 
-            let _c = self.peek();
-            while self.is_digit(_c) {
+            let mut c = self.peek();
+            while self.is_digit(c) {
                 self.advance();
-                let _c = self.peek();
+                c = self.peek();
             }
         }
 
@@ -244,9 +242,11 @@ impl Scanner {
     }
 
     fn advance(&mut self) -> char {
-        let character = self.source[self.current];
+        let character = self.source[self.current] as char;
+        let curr = self.current;
+        println!("{curr}: {character}");
         self.current += 1;
-        character as char
+        character
     }
 
     fn add_token(&mut self, token_type: TokenType, literal: Option<Literal>) {

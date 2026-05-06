@@ -1,6 +1,8 @@
 use std::env;
 use std::io;
 use std::fs;
+use std::io::stdout;
+use std::io::Write;
 
 use crate::tokens::{TokenType, Token, Literal};
 use crate::scanner::Scanner;
@@ -20,10 +22,10 @@ impl Rlox {
     pub fn main(&mut self) ->  io::Result<()> {
         let args: Vec<String> = env::args().collect();
 
-        if args.len() > 1 {
+        if args.len() > 2 {
               println!("Usage: jlox [script]");
               std::process::exit(64) 
-        } else if args.len() == 1 {
+        } else if args.len() == 2 {
             self.run_file(&args[0]).unwrap()
         } else {
             self.run_prompt().unwrap()
@@ -34,7 +36,6 @@ impl Rlox {
 
     fn run_file(&mut self, path: &String) -> io::Result<()> {
         let source = fs::read_to_string(path).unwrap();
-        println!("{source:?}");
         Rlox::run(self, source);
 
         if self.had_error { std::process::exit(65) }
@@ -45,6 +46,7 @@ impl Rlox {
     fn run_prompt(&mut self) -> io::Result<()> {
         let mut input = String::new();
         loop {
+            let _ = stdout().flush();
             println!("> ");
             match io::stdin().read_line(&mut input) {
                 Ok(_) => {},
