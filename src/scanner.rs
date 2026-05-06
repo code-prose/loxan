@@ -148,7 +148,7 @@ impl Scanner {
             let _c = self.peek();
         }
 
-        let slice = (&self.source[self.start..self.current]).clone().to_vec();
+        let slice = (&self.source[self.start..self.current]).to_vec();
         let text = String::from_utf8(slice).unwrap();
 
         let token: TokenType = match KEYWORDS.get(&text) {
@@ -190,7 +190,7 @@ impl Scanner {
             }
         }
 
-        let slice = (&self.source[self.start..self.current]).clone().to_vec();
+        let slice = (&self.source[self.start..self.current]).to_vec();
         let temp_string = String::from_utf8(slice).unwrap();
         let value = Some(
             Literal::Number(str::parse::<f64>(&temp_string).unwrap())
@@ -223,7 +223,7 @@ impl Scanner {
 
         self.advance();
 
-        let slice = (&self.source[self.start - 1..self.current + 1]).clone();
+        let slice = &self.source[self.start - 1..self.current + 1];
         let value = Some(
             Literal::Str(
                 String::from_utf8(slice.to_vec()).unwrap()
