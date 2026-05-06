@@ -1,12 +1,12 @@
 mod interpreter;
-mod logger;
 mod tokens;
 mod scanner;
 
 use crate::interpreter::Rlox;
-use crate::logger::Logger;
 
 fn main() {
     println!("Hello, world!");
+    let mut interp = Rlox::new();
+    let _ = interp.main();
 
 }
