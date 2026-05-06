@@ -44,24 +44,21 @@ impl Rlox {
     }
 
     fn run_prompt(&mut self) -> io::Result<()> {
-        let mut input = String::new();
-        loop {
-            let _ = stdout().flush();
-            println!("> ");
-            match io::stdin().read_line(&mut input) {
-                Ok(_) => {},
-                Err(e) => {
-                    println!("Could not interpret line: {e}");
-                    break
-                }
-            };
-            if input == "" { break }
-            else { Rlox::run(self, input.clone()) };
-            self.had_error = false
+        self.run_prompt_on(io::stdin(), io::stdout())
+    }
+
+    fn run_prompt_on(&mut self, input: impl io::Read, mut output: impl io::Write) -> io::Result<()> {
+        let reader = io::BufReader::new(input);
+        for line in io::BufRead::lines(reader) {
+            let line: String = line?;
+            if line.is_empty() { break }
+            let _ = write!(output, "> ");
+            output.flush()?;
+            self.run(line);
+            self.had_error = false;
         }
 
         Ok(())
-
     }
 
     fn run(&mut self, source: String) {
@@ -86,6 +83,21 @@ impl Rlox {
     pub fn error(&mut self, line: usize, message: String) {
         self.report(line, String::from(""), message);
     }
+}
 
+#[cfg(test)]
+mod tests {
+    use super::*;
 
+    #[test]
+    fn test_run_prompt_on_input() {
+        let mut rlox = Rlox::new();
+        let input = b"var test = 1;\n";
+        let mut output = Vec::new();
+
+        let res = rlox.run_prompt_on(input.as_ref(), &mut output);
+        println!("{res:?}");
+
+        assert!(!rlox.had_error);
+    }
 }
