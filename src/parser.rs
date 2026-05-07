@@ -3,7 +3,7 @@ use crate::{expressions::Expr, tokens::{Literal, Token, TokenType}};
 #[allow(dead_code)]
 struct Parser {
     tokens: Vec<Token>,
-    current: i32
+    current: usize
 }
 
 #[allow(dead_code)]
@@ -31,10 +31,6 @@ impl Parser {
         expr
     }
 
-    fn previous(&mut self) -> Token {
-        todo!("")
-    }
-
     fn match_tokens(&mut self, types: &[TokenType]) -> bool {
         for token_type in types {
             if self.check(token_type) {
@@ -54,16 +50,24 @@ impl Parser {
         }
     }
 
+    fn advance(&mut self) -> Token {
+        if self.is_at_end() {
+            self.current += 1;
+        }
+
+        self.previous()
+    }
+
     fn is_at_end(&mut self) -> bool {
-        todo!("")
+        self.peek().token_type == TokenType::EOF
     }
 
     fn peek(&mut self) -> Token {
-        todo!("")
+        self.tokens[self.current].clone()
     }
 
-    fn advance(&mut self) {
-        todo!("")
+    fn previous(&mut self) -> Token {
+        self.tokens[self.current - 1].clone()
     }
 
     fn comparison(&mut self) -> Expr {
