@@ -3,6 +3,7 @@ mod tokens;
 mod scanner;
 mod expressions;
 mod ast;
+mod parser;
 
 use crate::interpreter::Rlox;
 use crate::expressions::{Expr, pretty_print};
