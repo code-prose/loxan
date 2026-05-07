@@ -20,11 +20,18 @@ pub enum Expr {
 
 pub fn pretty_print(expr: &Expr) -> String {
     match expr {
-        Expr::Literal { literal } => format!("({literal:?})"),
-        Expr::Grouping { expr } => format!("group {}", pretty_print(expr)),
-        Expr::Unary { operator, expr } => format!("{} {}", operator.lexeme, pretty_print(expr)),
+        Expr::Grouping { expr } => format!("(group {})", pretty_print(expr)),
+        Expr::Unary { operator, expr } => format!("({} {})", operator.lexeme, pretty_print(expr)),
         Expr::Binary { left, operator, right } => {
             format!("({} {} {})", operator.lexeme, pretty_print(left), pretty_print(right))
+        },
+        Expr::Literal { literal } => {
+            match literal {
+                Literal::Number(n) => format!("{n}"),
+                Literal::Str(s) => format!("{s}"),
+                Literal::Bool(b) => format!("{b}"),
+                Literal::Nil => String::from("nil")
+            }
         },
     }
 }
