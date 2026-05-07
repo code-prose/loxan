@@ -1,15 +1,21 @@
-use crate::{expressions::Expr, tokens::{Literal, Token, TokenType}};
+use crate::{
+    expressions::Expr,
+    tokens::{Literal, Token, TokenType},
+};
 
 #[allow(dead_code)]
 struct Parser {
     tokens: Vec<Token>,
-    current: usize
+    current: usize,
 }
 
 #[allow(dead_code)]
 impl Parser {
     fn new(tokens: Vec<Token>) -> Self {
-        Self { tokens: tokens, current: 0 }
+        Self {
+            tokens: tokens,
+            current: 0,
+        }
     }
 
     fn expression(&mut self) -> Box<Expr> {
@@ -17,25 +23,53 @@ impl Parser {
     }
 
     fn equality(&mut self) -> Box<Expr> {
+        let mut expr = self.comparison();
 
-        let mut expr = Box::new(self.comparison());
-        
         while self.match_tokens(&[TokenType::BangEqual, TokenType::EqualEqual]) {
             let opr = self.previous();
-            let right = Box::new(self.comparison());
-            
-            expr = Box::new(Expr::Binary {left: expr, operator: opr, right: right })
+            let right = self.comparison();
 
+            expr = Box::new(Expr::Binary {
+                left: expr,
+                operator: opr,
+                right: right,
+            })
         }
-        
+
         expr
+    }
+
+    fn comparison(&mut self) -> Box<Expr> {
+        let mut expr: Box<Expr> = self.term();
+
+        while self.match_tokens(&[
+            TokenType::Greater,
+            TokenType::GreaterEqual,
+            TokenType::Less,
+            TokenType::LessEqual,
+        ]) {
+            let opr: Token = self.previous();
+
+            let right: Box<Expr> = self.term();
+            expr = Box::new(Expr::Binary {
+                left: expr,
+                operator: opr,
+                right: right,
+            });
+        }
+
+        expr
+    }
+
+    fn term(&mut self) -> Box<Expr> {
+        todo!("")
     }
 
     fn match_tokens(&mut self, types: &[TokenType]) -> bool {
         for token_type in types {
             if self.check(token_type) {
                 self.advance();
-                return true
+                return true;
             }
         }
 
@@ -46,7 +80,7 @@ impl Parser {
         if self.is_at_end() {
             false
         } else {
-            return self.peek().token_type == *token_type
+            return self.peek().token_type == *token_type;
         }
     }
 
@@ -69,10 +103,4 @@ impl Parser {
     fn previous(&mut self) -> Token {
         self.tokens[self.current - 1].clone()
     }
-
-    fn comparison(&mut self) -> Expr {
-        todo!("")
-    }
-
-
 }
