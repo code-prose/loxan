@@ -39,9 +39,38 @@ impl Parser {
         }
     }
 
-    pub fn report(line: usize, loc: String, message: String) {
+    fn report(line: usize, loc: String, message: String) {
         println!("[line {line}] Error {loc}: {message}");
     }
+
+    fn synchronize(&mut self) {
+        self.advance();
+
+        while !self.is_at_end() {
+            if self.previous().token_type == TokenType::Semicolon {
+                return
+            }
+
+            match self.peek().token_type {
+                TokenType::Return => return,
+                _ => continue
+            }
+        }
+
+        self.advance();
+    }
+
+    fn parse(&mut self) -> Option<Box<Expr>> {
+        match self.expression() {
+            Ok(v) => return Some(v),
+            Err(_) => {
+                println!("Couldn't parse expression");
+                None
+            }
+        }
+    }
+
+
 
     fn expression(&mut self) -> Result<Box<Expr>, ParsingError> {
         self.equality()
@@ -149,8 +178,9 @@ impl Parser {
             return Ok(Box::new(Expr::Grouping { expr: expr }))
         }
 
-        println!("Expected to find a primary expression");
-        std::process::exit(102)
+        let err = ParsingError{peek_token: self.peek(), message: String::from("Expected an expression")};
+        Parser::error(err.clone());
+        Err(err)
     }
 
     fn consume(&mut self, token_type: TokenType, message: String) -> Result<Token, ParsingError> {
