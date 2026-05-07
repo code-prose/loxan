@@ -36,6 +36,33 @@ impl Parser {
     }
 
     fn match_tokens(&mut self, types: &[TokenType]) -> bool {
+        for token_type in types {
+            if self.check(token_type) {
+                self.advance();
+                return true
+            }
+        }
+
+        false
+    }
+
+    fn check(&mut self, token_type: &TokenType) -> bool {
+        if self.is_at_end() {
+            false
+        } else {
+            return self.peek().token_type == *token_type
+        }
+    }
+
+    fn is_at_end(&mut self) -> bool {
+        todo!("")
+    }
+
+    fn peek(&mut self) -> Token {
+        todo!("")
+    }
+
+    fn advance(&mut self) {
         todo!("")
     }
 
