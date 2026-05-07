@@ -51,7 +51,7 @@ impl Parser {
     }
 
     fn advance(&mut self) -> Token {
-        if self.is_at_end() {
+        if !self.is_at_end() {
             self.current += 1;
         }
 
