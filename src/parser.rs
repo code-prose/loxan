@@ -9,6 +9,15 @@ struct Parser {
     current: usize,
 }
 
+// I should let peek_token be an Option<_> and then I can handle the cases where I don't have a
+// token to raise with
+#[allow(dead_code)]
+#[derive(Debug, Clone)]
+struct ParsingError {
+    peek_token: Token,
+    message: String
+}
+
 #[allow(dead_code)]
 impl Parser {
     fn new(tokens: Vec<Token>) -> Self {
@@ -18,16 +27,32 @@ impl Parser {
         }
     }
 
-    fn expression(&mut self) -> Box<Expr> {
+    fn error(err: ParsingError) {
+        match err.peek_token.token_type {
+            TokenType::EOF => {
+                Parser::report(err.peek_token.line, String::from(" at end"), err.message);
+            },
+            _ => {
+                let lexeme = err.peek_token.lexeme;
+                Parser::report(err.peek_token.line, format!(" at '{lexeme}'"), err.message)
+            }
+        }
+    }
+
+    pub fn report(line: usize, loc: String, message: String) {
+        println!("[line {line}] Error {loc}: {message}");
+    }
+
+    fn expression(&mut self) -> Result<Box<Expr>, ParsingError> {
         self.equality()
     }
 
-    fn equality(&mut self) -> Box<Expr> {
-        let mut expr = self.comparison();
+    fn equality(&mut self) -> Result<Box<Expr>, ParsingError> {
+        let mut expr = self.comparison()?;
 
         while self.match_tokens(&[TokenType::BangEqual, TokenType::EqualEqual]) {
             let opr = self.previous();
-            let right = self.comparison();
+            let right = self.comparison()?;
 
             expr = Box::new(Expr::Binary {
                 left: expr,
@@ -36,11 +61,11 @@ impl Parser {
             })
         }
 
-        expr
+        Ok(expr)
     }
 
-    fn comparison(&mut self) -> Box<Expr> {
-        let mut expr: Box<Expr> = self.term();
+    fn comparison(&mut self) -> Result<Box<Expr>, ParsingError> {
+        let mut expr: Box<Expr> = self.term()?;
 
         while self.match_tokens(&[
             TokenType::Greater,
@@ -50,7 +75,7 @@ impl Parser {
         ]) {
             let opr: Token = self.previous();
 
-            let right: Box<Expr> = self.term();
+            let right: Box<Expr> = self.term()?;
             expr = Box::new(Expr::Binary {
                 left: expr,
                 operator: opr,
@@ -58,37 +83,82 @@ impl Parser {
             });
         }
 
-        expr
+        Ok(expr)
     }
 
-    fn term(&mut self) -> Box<Expr> {
-        let mut expr = self.factor();
+    fn term(&mut self) -> Result<Box<Expr>, ParsingError> {
+        let mut expr = self.factor()?;
 
         while self.match_tokens(&[TokenType::Minus, TokenType::Plus]) {
             let opr = self.previous();
-            let right = self.factor();
+            let right = self.factor()?;
 
             expr = Box::new(Expr::Binary { left: expr, operator: opr, right: right });
         }
 
 
-        expr
+        Ok(expr)
     }
 
-    fn factor(&mut self) -> Box<Expr> {
-        let mut expr = self.unary();
+    fn factor(&mut self) -> Result<Box<Expr>, ParsingError> {
+        let mut expr = self.unary()?;
         while self.match_tokens(&[TokenType::Slash, TokenType::Star]) {
             let opr = self.previous();
-            let right = self.unary();
+            let right = self.unary()?;
 
             expr = Box::new(Expr::Binary { left: expr, operator: opr, right: right});
         }
 
-        expr
+        Ok(expr)
     }
 
-    fn unary(&mut self) -> Box<Expr> {
-        todo!("")
+    fn unary(&mut self) -> Result<Box<Expr>, ParsingError> {
+        if self.match_tokens(&[TokenType::Bang, TokenType::Minus]) {
+            let opr = self.previous();
+            let right = self.unary()?;
+            return Ok(Box::new(Expr::Unary { operator: opr, expr: right }))
+        }
+
+        self.primary()
+    }
+
+    fn primary(&mut self) -> Result<Box<Expr>, ParsingError> {
+        if self.match_tokens(&[TokenType::False]) {
+            return Ok(Box::new(Expr::Literal { literal: Literal::Bool(false) }))
+        }
+        if self.match_tokens(&[TokenType::True]) {
+            return Ok(Box::new(Expr::Literal { literal: Literal::Bool(true) }))
+        }
+        if self.match_tokens(&[TokenType::Nil]) {
+            return Ok(Box::new(Expr::Literal { literal: Literal::Nil }))
+        }
+
+        if self.match_tokens(&[TokenType::Number, TokenType::String]) {
+            match self.previous().literal {
+                Some(v) => return Ok(Box::new(Expr::Literal { literal: v })),
+                None => {
+                    println!("Expected to find a literal");
+                    std::process::exit(101)
+                }
+            }
+        }
+
+        if self.match_tokens(&[TokenType::LeftParen]) {
+            let expr = self.expression()?;
+            let _ = self.consume(TokenType::RightParen, String::from("Expected ')' after expression.")).unwrap();
+            return Ok(Box::new(Expr::Grouping { expr: expr }))
+        }
+
+        println!("Expected to find a primary expression");
+        std::process::exit(102)
+    }
+
+    fn consume(&mut self, token_type: TokenType, message: String) -> Result<Token, ParsingError> {
+        if self.check(&token_type) {
+            return Ok(self.advance())
+        }
+
+        Err(ParsingError{ peek_token: self.peek(), message: message})
     }
 
     fn match_tokens(&mut self, types: &[TokenType]) -> bool {
