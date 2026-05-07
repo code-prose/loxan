@@ -19,8 +19,8 @@ impl Parser {
     fn equality(&mut self) -> Box<Expr> {
 
         let mut expr = Box::new(self.comparison());
-
-        while (self.match(TokenType::BangEqual, TokenType::BangEqual)) {
+        
+        while self.match_tokens(&[TokenType::BangEqual, TokenType::EqualEqual]) {
             let opr = self.previous();
             let right = Box::new(self.comparison());
             
@@ -35,7 +35,7 @@ impl Parser {
         todo!("")
     }
 
-    fn match(&mut self) -> bool {
+    fn match_tokens(&mut self, types: &[TokenType]) -> bool {
         todo!("")
     }
 
