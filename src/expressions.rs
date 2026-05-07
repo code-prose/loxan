@@ -1,6 +1,6 @@
 use crate::tokens::{Literal, Token, TokenType};
 
-enum Expr {
+pub enum Expr {
     Literal {
         literal: Literal,
     },
