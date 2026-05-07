@@ -62,6 +62,32 @@ impl Parser {
     }
 
     fn term(&mut self) -> Box<Expr> {
+        let mut expr = self.factor();
+
+        while self.match_tokens(&[TokenType::Minus, TokenType::Plus]) {
+            let opr = self.previous();
+            let right = self.factor();
+
+            expr = Box::new(Expr::Binary { left: expr, operator: opr, right: right });
+        }
+
+
+        expr
+    }
+
+    fn factor(&mut self) -> Box<Expr> {
+        let mut expr = self.unary();
+        while self.match_tokens(&[TokenType::Slash, TokenType::Star]) {
+            let opr = self.previous();
+            let right = self.unary();
+
+            expr = Box::new(Expr::Binary { left: expr, operator: opr, right: right});
+        }
+
+        expr
+    }
+
+    fn unary(&mut self) -> Box<Expr> {
         todo!("")
     }
 
