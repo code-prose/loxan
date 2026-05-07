@@ -10,15 +10,11 @@ enum Expr {
         right: Box<Expr>
     },
     Unary {
-        operator: Option<Token>,
+        operator: Token,
         expr: Box<Expr>
 
     },
     Grouping {
-        // left paren
-        left: TokenType,
-        // right paren
-        right: TokenType,
         expr: Box<Expr>
     },
 }
