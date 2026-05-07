@@ -5,8 +5,10 @@ use std::io::prelude::*;
 
 pub struct GenerateAst;
 
+// Perhaps I don't need this....
+#[allow(dead_code)]
 impl GenerateAst {
-    fn main(&mut self, args: Vec<String>) -> io::Result<()> {
+    fn main(&mut self) -> io::Result<()> {
         let args: Vec<String> = env::args().collect();
 
         if args.len() != 2 {
@@ -15,10 +17,10 @@ impl GenerateAst {
         }
         let output_dir = args[1].clone();
         let mut expr_array = Vec::new();
-        expr_array.push("Binary   : Expr left, Token operator, Expr right".to_string());
-        expr_array.push("Grouping : Expr expression".to_string());
-        expr_array.push("Literal  : Object value".to_string());
-        expr_array.push("Unary    : Token operator, Expr right".to_string());
+        expr_array.push("Binary   - left: Expr,\n operator: Token,\n right: Expr\n".to_string());
+        expr_array.push("Grouping - expression: Expr\n".to_string());
+        expr_array.push("Literal  - value: Option<Literal>\n".to_string());
+        expr_array.push("Unary    - operator: Token, right: Expr\n".to_string());
 
         let _res = self.define_ast(output_dir, String::from("Expr"), expr_array);
 
@@ -43,7 +45,7 @@ impl GenerateAst {
 
         // expr defs
         for expr_type in expression_types {
-            let mut enum_name_iter = expr_type.split_terminator(':');
+            let mut enum_name_iter = expr_type.split_terminator('-');
             let enum_name = match enum_name_iter.next() {
                 Some(v) => v,
                 None => {
@@ -62,7 +64,7 @@ impl GenerateAst {
             }
             .to_string();
 
-            self.define_type(&mut file, &base_enum_name, enum_name, enum_fields);
+            let _ = self.define_type(&mut file, enum_name, enum_fields);
         }
 
         file.write_all(b"}\n")?;
@@ -72,10 +74,11 @@ impl GenerateAst {
     fn define_type(
         &mut self,
         file: &mut std::fs::File,
-        base_enum_name: &String,
         enum_name: String,
         enum_fields: String,
-    ) {
-        todo!("")
+    ) -> io::Result<()> {
+        let holder = format!("{enum_name} {{\n{enum_fields}}},");
+        let _ = file.write_all(&holder.into_bytes())?;
+        Ok(())
     }
 }
