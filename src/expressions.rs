@@ -1,5 +1,6 @@
 use crate::tokens::{Literal, Token};
 
+#[allow(dead_code)]
 pub enum Expr {
     Literal {
         literal: Literal,
@@ -18,6 +19,7 @@ pub enum Expr {
     },
 }
 
+#[allow(dead_code)]
 pub fn pretty_print(expr: &Expr) -> String {
     match expr {
         Expr::Grouping { expr } => format!("(group {})", pretty_print(expr)),
@@ -33,5 +35,30 @@ pub fn pretty_print(expr: &Expr) -> String {
                 Literal::Nil => String::from("nil")
             }
         },
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::TokenType;
+
+    #[test]
+    fn test_pretty_print() {
+        let expression = Expr::Binary {
+            left: Box::new(Expr::Unary {
+                operator: Token::new(TokenType::Minus, String::from("-"), None, 1),
+                expr: Box::new(Expr::Literal { literal: Literal::Number(123.0) }),
+            }),
+            operator: Token::new(TokenType::Star, String::from("*"), None, 1),
+            right: Box::new(Expr::Grouping {
+                expr: Box::new(Expr::Literal { literal: Literal::Number(45.67) })
+            }
+
+            ),
+        };
+        assert_eq!(String::from("(* (- 123) (group 45.67))"), pretty_print(&expression));
+
     }
 }
