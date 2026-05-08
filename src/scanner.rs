@@ -72,8 +72,8 @@ impl Scanner {
     fn scan_token(&mut self, interp: &mut Rlox) {
         let character: char = self.advance();
         match character {
-            '(' => self.add_token(TokenType::RightParen, None),
-            ')' => self.add_token(TokenType::LeftParen, None),
+            ')' => self.add_token(TokenType::RightParen, None),
+            '(' => self.add_token(TokenType::LeftParen, None),
             '{' => self.add_token(TokenType::LeftBrace, None),
             '}' => self.add_token(TokenType::RightBrace, None),
             ',' => self.add_token(TokenType::Comma, None),
