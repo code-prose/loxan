@@ -43,7 +43,7 @@ pub fn pretty_print(expr: &Expr) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::TokenType;
+    use crate::tokens::TokenType;
 
     #[test]
     fn test_pretty_print() {
