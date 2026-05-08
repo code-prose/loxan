@@ -219,7 +219,7 @@ impl Expr {
                     }
                 }
             },
-            Expr::Ternary { left, operator, middle, right } => {
+            Expr::Ternary { left, middle, right, .. } => {
                 let left = Self::evaluate(left)?;
 
                 if Self::is_truthy(&left) {
@@ -229,9 +229,6 @@ impl Expr {
                 }
             },
             Expr::Grouping { expr } => Self::evaluate(expr),
-            _ => {
-                Err(EvaluationError { line_no: 0, message: String::from("") })
-            }
         }
 
     }
