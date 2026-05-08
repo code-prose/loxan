@@ -1,5 +1,6 @@
 use crate::tokens::{self, Literal, Token, TokenType};
 
+#[allow(dead_code)]
 pub struct EvaluationError {
     line_no: usize,
     message: String
@@ -32,7 +33,7 @@ pub enum Expr {
 }
 
 
-
+#[allow(dead_code)]
 impl Expr {
     pub fn pretty_print(expr: &Expr) -> String {
         match expr {
