@@ -6,6 +6,12 @@ pub enum Expr {
     Literal {
         literal: Literal,
     },
+    Ternary {
+        left: Box<Expr>,
+        operator: Token,
+        middle: Box<Expr>,
+        right: Box<Expr>
+    },
     Binary {
         left: Box<Expr>,
         operator: Token,
@@ -28,6 +34,7 @@ pub fn pretty_print(expr: &Expr) -> String {
         Expr::Binary { left, operator, right } => {
             format!("({} {} {})", operator.lexeme, pretty_print(left), pretty_print(right))
         },
+        Expr::Ternary { left, operator, middle, right } => format!("({} {} {} : {})", pretty_print(left), operator.lexeme, pretty_print(middle), pretty_print(right)),
         Expr::Literal { literal } => {
             match literal {
                 Literal::Number(n) => format!("{n}"),
