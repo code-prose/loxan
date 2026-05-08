@@ -36,7 +36,7 @@ impl Rlox {
 
     fn run_file(&mut self, path: &String) -> io::Result<()> {
         let source = fs::read_to_string(path).unwrap();
-        Rlox::run(self, source);
+        Rlox::run(self, source, &mut std::io::stdout());
 
         if self.had_error { std::process::exit(65) }
 
@@ -54,20 +54,20 @@ impl Rlox {
             output.flush()?;
             let mut line = String::new();
             if reader.read_line(&mut line)? == 0 || line.trim().is_empty() { break }
-            self.run(line.trim_end().to_string());
+            self.run(line.trim_end().to_string(), &mut output);
             self.had_error = false;
         }
 
         Ok(())
     }
 
-    fn run(&mut self, source: String) {
+    fn run(&mut self, source: String, output: &mut impl io::Write) {
         let mut scanner = Scanner::new(source);
         let tokens: Vec<Token> = scanner.scan_tokens(self);
 
         let mut parser = Parser::new(tokens);
         if let Some(expr) = parser.parse() {
-            println!("{}", pretty_print(&expr))
+            writeln!(output, "{}", pretty_print(&expr)).unwrap();
         }
 
         // for token in tokens.iter() {
