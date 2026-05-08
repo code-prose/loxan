@@ -15,7 +15,7 @@ pub struct Parser {
 #[derive(Debug, Clone)]
 struct ParsingError {
     peek_token: Token,
-    message: String
+    message: String,
 }
 
 #[allow(dead_code)]
@@ -41,7 +41,7 @@ impl Parser {
         match err.peek_token.token_type {
             TokenType::EOF => {
                 Parser::report(err.peek_token.line, String::from(" at end"), err.message);
-            },
+            }
             _ => {
                 let lexeme = err.peek_token.lexeme;
                 Parser::report(err.peek_token.line, format!(" at '{lexeme}'"), err.message)
@@ -58,7 +58,7 @@ impl Parser {
 
         while !self.is_at_end() {
             if self.previous().token_type == TokenType::Semicolon {
-                return
+                return;
             }
 
             match self.peek().token_type {
@@ -68,23 +68,46 @@ impl Parser {
 
             self.advance();
         }
-
     }
 
-    // Maybe: ternary operator ?: support
+    // ternary operator ?: support
+    fn ternary(&mut self) -> Result<Box<Expr>, ParsingError> {
+        let mut expr = self.equality()?;
+
+        if self.match_tokens(&[TokenType::Question]) {
+            let middle = self.expression()?;
+            if self.match_tokens(&[TokenType::Colon]) {
+                let operator = self.previous();
+                let right = self.expression()?;
+                expr = Box::new(Expr::Ternary {
+                    left: expr,
+                    operator,
+                    middle,
+                    right
+                })
+            } else {
+                return Err(ParsingError {
+                    peek_token: self.peek(),
+                    message: String::from("Failed to find matching : for ternary expression"),
+                });
+            }
+        }
+
+        Ok(expr)
+    }
 
     // C style comma expressions support
     fn comma(&mut self) -> Result<Box<Expr>, ParsingError> {
-        let mut expr = self.equality()?;
+        let mut expr = self.ternary()?;
 
         while self.match_tokens(&[TokenType::Comma]) {
             let operator = self.previous();
-            let right = self.equality()?;
+            let right = self.ternary()?;
 
             expr = Box::new(Expr::Binary {
                 left: expr,
                 operator,
-                right
+                right,
             });
         }
 
@@ -122,7 +145,6 @@ impl Parser {
             TokenType::LessEqual,
         ]) {
             let operator: Token = self.previous();
-
             let right: Box<Expr> = self.term()?;
             expr = Box::new(Expr::Binary {
                 left: expr,
@@ -141,9 +163,12 @@ impl Parser {
             let operator = self.previous();
             let right = self.factor()?;
 
-            expr = Box::new(Expr::Binary { left: expr, operator, right });
+            expr = Box::new(Expr::Binary {
+                left: expr,
+                operator,
+                right,
+            });
         }
-
 
         Ok(expr)
     }
@@ -154,7 +179,11 @@ impl Parser {
             let operator = self.previous();
             let right = self.unary()?;
 
-            expr = Box::new(Expr::Binary { left: expr, operator, right});
+            expr = Box::new(Expr::Binary {
+                left: expr,
+                operator,
+                right,
+            });
         }
 
         Ok(expr)
@@ -164,7 +193,10 @@ impl Parser {
         if self.match_tokens(&[TokenType::Bang, TokenType::Minus]) {
             let operator = self.previous();
             let right = self.unary()?;
-            return Ok(Box::new(Expr::Unary { operator, expr: right }))
+            return Ok(Box::new(Expr::Unary {
+                operator,
+                expr: right,
+            }));
         }
 
         self.primary()
@@ -172,13 +204,19 @@ impl Parser {
 
     fn primary(&mut self) -> Result<Box<Expr>, ParsingError> {
         if self.match_tokens(&[TokenType::False]) {
-            return Ok(Box::new(Expr::Literal { literal: Literal::Bool(false) }))
+            return Ok(Box::new(Expr::Literal {
+                literal: Literal::Bool(false),
+            }));
         }
         if self.match_tokens(&[TokenType::True]) {
-            return Ok(Box::new(Expr::Literal { literal: Literal::Bool(true) }))
+            return Ok(Box::new(Expr::Literal {
+                literal: Literal::Bool(true),
+            }));
         }
         if self.match_tokens(&[TokenType::Nil]) {
-            return Ok(Box::new(Expr::Literal { literal: Literal::Nil }))
+            return Ok(Box::new(Expr::Literal {
+                literal: Literal::Nil,
+            }));
         }
 
         if self.match_tokens(&[TokenType::Number, TokenType::String]) {
@@ -193,21 +231,30 @@ impl Parser {
 
         if self.match_tokens(&[TokenType::LeftParen]) {
             let expr = self.expression()?;
-            self.consume(TokenType::RightParen, String::from("Expected ')' after expression."))?;
-            return Ok(Box::new(Expr::Grouping { expr: expr }))
+            self.consume(
+                TokenType::RightParen,
+                String::from("Expected ')' after expression."),
+            )?;
+            return Ok(Box::new(Expr::Grouping { expr: expr }));
         }
 
-        let err = ParsingError{peek_token: self.peek(), message: String::from("Expected an expression")};
+        let err = ParsingError {
+            peek_token: self.peek(),
+            message: String::from("Expected an expression"),
+        };
         Parser::error(err.clone());
         Err(err)
     }
 
     fn consume(&mut self, token_type: TokenType, message: String) -> Result<Token, ParsingError> {
         if self.check(&token_type) {
-            return Ok(self.advance())
+            return Ok(self.advance());
         }
 
-        Err(ParsingError{ peek_token: self.peek(), message: message})
+        Err(ParsingError {
+            peek_token: self.peek(),
+            message: message,
+        })
     }
 
     fn match_tokens(&mut self, types: &[TokenType]) -> bool {
