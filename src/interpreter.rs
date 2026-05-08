@@ -1,9 +1,9 @@
 use std::env;
 use std::io;
 use std::fs;
-use std::io::stdout;
-use std::io::Write;
 
+use crate::expressions::pretty_print;
+use crate::parser::Parser;
 use crate::tokens::{TokenType, Token, Literal};
 use crate::scanner::Scanner;
 
@@ -65,9 +65,14 @@ impl Rlox {
         let mut scanner = Scanner::new(source);
         let tokens: Vec<Token> = scanner.scan_tokens(self);
 
-        for token in tokens.iter() {
-            println!("{token:?}")
+        let mut parser = Parser::new(tokens);
+        if let Some(expr) = parser.parse() {
+            println!("{}", pretty_print(&expr))
         }
+
+        // for token in tokens.iter() {
+        //     println!("{token:?}")
+        // }
     }
 
     // Perhaps something like this in the future
