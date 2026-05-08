@@ -125,6 +125,90 @@ impl Expr {
                             }
                         }
                     },
+                    TokenType::GreaterEqual => {
+                        match (left, right) {
+                            (Literal::Number(a), Literal::Number(b)) => {
+                                Ok(Literal::Bool(a >= b))
+                            },
+                            (_, _) => {
+                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operand {}", operator.lexeme) })
+                            }
+                        }
+                    },
+                    TokenType::Greater => {
+                        match (left, right) {
+                            (Literal::Number(a), Literal::Number(b)) => {
+                                Ok(Literal::Bool(a > b))
+                            },
+                            (_, _) => {
+                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operand {}", operator.lexeme) })
+                            }
+                        }
+                    },
+                    TokenType::LessEqual => {
+                        match (left, right) {
+                            (Literal::Number(a), Literal::Number(b)) => {
+                                Ok(Literal::Bool(a <= b))
+                            },
+                            (_, _) => {
+                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operand {}", operator.lexeme) })
+                            }
+                        }
+                    },
+                    TokenType::Less => {
+                        match (left, right) {
+                            (Literal::Number(a), Literal::Number(b)) => {
+                                Ok(Literal::Bool(a < b))
+                            },
+                            (_, _) => {
+                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operand {}", operator.lexeme) })
+                            }
+                        }
+                    },
+                    TokenType::EqualEqual => {
+                        match (left, right) {
+                            (Literal::Number(a), Literal::Number(b)) => {
+                                Ok(Literal::Bool(a == b))
+                            },
+                            (Literal::Bool(a), Literal::Bool(b)) => {
+                                Ok(Literal::Bool(a == b))
+                            },
+                            (Literal::Str(a), Literal::Str(b)) => {
+                                Ok(Literal::Bool(a == b))
+                            },
+                            (Literal::Nil, Literal::Nil) => {
+                                Ok(Literal::Bool(true))
+                            },
+                            (Literal::Nil, _) => {
+                                Ok(Literal::Bool(false))
+                            },
+                            (_, _) => {
+                                Ok(Literal::Bool(false))
+                            }
+                        }
+                    },
+                    TokenType::BangEqual => {
+                        match (left, right) {
+                            (Literal::Number(a), Literal::Number(b)) => {
+                                Ok(Literal::Bool(a != b))
+                            },
+                            (Literal::Bool(a), Literal::Bool(b)) => {
+                                Ok(Literal::Bool(a != b))
+                            },
+                            (Literal::Str(a), Literal::Str(b)) => {
+                                Ok(Literal::Bool(a != b))
+                            },
+                            (Literal::Nil, Literal::Nil) => {
+                                Ok(Literal::Bool(false))
+                            },
+                            (Literal::Nil, _) => {
+                                Ok(Literal::Bool(true))
+                            },
+                            (_, _) => {
+                                Ok(Literal::Bool(true))
+                            }
+                        }
+                    },
                     _ => {
                         Err(
                             EvaluationError {
@@ -136,19 +220,14 @@ impl Expr {
                 }
             },
             Expr::Ternary { left, operator, middle, right } => {
-                let left = Self::evaluate(expr)?;
-                let middle = Self::evaluate(expr)?;
-                let right = Self::evaluate(expr)?;
+                let left = Self::evaluate(left)?;
 
-                match operator.token_type {
-                    TokenType::Colon => {
-
-                    }
-                    _ => {
-
-                    }
+                if Self::is_truthy(&left) {
+                    Self::evaluate(middle)
+                } else {
+                    Self::evaluate(right)
                 }
-            }
+            },
             Expr::Grouping { expr } => Self::evaluate(expr),
             _ => {
                 Err(EvaluationError { line_no: 0, message: String::from("") })
