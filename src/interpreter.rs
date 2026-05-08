@@ -1,5 +1,5 @@
 use std::env;
-use std::io;
+use std::io::{self, BufRead, Write};
 use std::fs;
 
 use crate::expressions::pretty_print;
@@ -48,13 +48,13 @@ impl Rlox {
     }
 
     fn run_prompt_on(&mut self, input: impl io::Read, mut output: impl io::Write) -> io::Result<()> {
-        let reader = io::BufReader::new(input);
-        for line in io::BufRead::lines(reader) {
-            let line: String = line?;
-            if line.is_empty() { break }
-            let _ = write!(output, "> ");
+        let mut reader = io::BufReader::new(input);
+        loop {
+            write!(output, "> ")?;
             output.flush()?;
-            self.run(line);
+            let mut line = String::new();
+            if reader.read_line(&mut line)? == 0 || line.trim().is_empty() { break }
+            self.run(line.trim_end().to_string());
             self.had_error = false;
         }
 
