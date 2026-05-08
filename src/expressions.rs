@@ -1,6 +1,7 @@
 use crate::tokens::{Literal, Token};
 
 #[allow(dead_code)]
+#[derive(Debug, Clone)]
 pub enum Expr {
     Literal {
         literal: Literal,

@@ -4,7 +4,7 @@ use crate::{
 };
 
 #[allow(dead_code)]
-struct Parser {
+pub struct Parser {
     tokens: Vec<Token>,
     current: usize,
 }
@@ -20,10 +20,20 @@ struct ParsingError {
 
 #[allow(dead_code)]
 impl Parser {
-    fn new(tokens: Vec<Token>) -> Self {
+    pub fn new(tokens: Vec<Token>) -> Self {
         Self {
             tokens: tokens,
             current: 0,
+        }
+    }
+
+    pub fn parse(&mut self) -> Option<Box<Expr>> {
+        match self.expression() {
+            Ok(v) => return Some(v),
+            Err(_) => {
+                println!("Couldn't parse expression");
+                None
+            }
         }
     }
 
@@ -59,18 +69,6 @@ impl Parser {
 
         self.advance();
     }
-
-    fn parse(&mut self) -> Option<Box<Expr>> {
-        match self.expression() {
-            Ok(v) => return Some(v),
-            Err(_) => {
-                println!("Couldn't parse expression");
-                None
-            }
-        }
-    }
-
-
 
     fn expression(&mut self) -> Result<Box<Expr>, ParsingError> {
         self.equality()
