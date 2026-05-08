@@ -71,8 +71,28 @@ impl Parser {
 
     }
 
+    // Maybe: ternary operator ?: support
+
+    // C style comma expressions support
+    fn comma(&mut self) -> Result<Box<Expr>, ParsingError> {
+        let mut expr = self.equality()?;
+
+        while self.match_tokens(&[TokenType::Comma]) {
+            let operator = self.previous();
+            let right = self.equality()?;
+
+            expr = Box::new(Expr::Binary {
+                left: expr,
+                operator,
+                right
+            });
+        }
+
+        Ok(expr)
+    }
+
     fn expression(&mut self) -> Result<Box<Expr>, ParsingError> {
-        self.equality()
+        self.comma()
     }
 
     fn equality(&mut self) -> Result<Box<Expr>, ParsingError> {
