@@ -80,6 +80,8 @@ impl Scanner {
             '.' => self.add_token(TokenType::Dot, None),
             '-' => self.add_token(TokenType::Minus, None),
             '+' => self.add_token(TokenType::Plus, None),
+            '?' => self.add_token(TokenType::Question, None),
+            ':' => self.add_token(TokenType::Colon, None),
             ';' => self.add_token(TokenType::Semicolon, None),
             '*' => {
                 if self.match_token('/') {
