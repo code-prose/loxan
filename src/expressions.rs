@@ -34,7 +34,7 @@ pub fn pretty_print(expr: &Expr) -> String {
         Expr::Binary { left, operator, right } => {
             format!("({} {} {})", operator.lexeme, pretty_print(left), pretty_print(right))
         },
-        Expr::Ternary { left, operator, middle, right } => format!("({} {} {} : {})", pretty_print(left), operator.lexeme, pretty_print(middle), pretty_print(right)),
+        Expr::Ternary { left, operator, middle, right } => format!("({} ? {} {} {})", pretty_print(left), pretty_print(middle), operator.lexeme, pretty_print(right)),
         Expr::Literal { literal } => {
             match literal {
                 Literal::Number(n) => format!("{n}"),
