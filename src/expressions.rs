@@ -74,7 +74,7 @@ impl Expr {
                     },
                     TokenType::Bang => Ok(Literal::Bool(!Self::is_truthy(&right))),
                     _ => {
-                        Err(EvaluationError { line_no: operator.line, message: String::from("Failed to parse unary expression on line: {line_no}") })
+                        Err(EvaluationError { line_no: operator.line, message: String::from("Failed to parse unary expression, operand must be a boolean") })
                     },
                 }
             },
@@ -89,7 +89,7 @@ impl Expr {
                                 Ok(Literal::Number(a * b))
                             },
                             (_, _) => {
-                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operand {}", operator.lexeme) })
+                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operator {} on non-numbers", operator.lexeme) })
                             }
                         }
                     },
@@ -99,7 +99,7 @@ impl Expr {
                                 Ok(Literal::Number(a / b))
                             },
                             (_, _) => {
-                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operand {}", operator.lexeme) })
+                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operator {} on non-numbers", operator.lexeme) })
                             }
                         }
                     },
@@ -112,7 +112,7 @@ impl Expr {
                                 Ok(Literal::Str(s + &t))
                             },
                             (_, _) => {
-                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operand {}", operator.lexeme) })
+                                Err(EvaluationError { line_no: operator.line, message: format!("Operator {} must be used on numbers or strings", operator.lexeme) })
                             }
                         }
                     },
@@ -122,7 +122,7 @@ impl Expr {
                                 Ok(Literal::Number(a - b))
                             },
                             (_, _) => {
-                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operand {}", operator.lexeme) })
+                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operator {} on non-numbers", operator.lexeme) })
                             }
                         }
                     },
@@ -132,7 +132,7 @@ impl Expr {
                                 Ok(Literal::Bool(a >= b))
                             },
                             (_, _) => {
-                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operand {}", operator.lexeme) })
+                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operator {} on non-numbers", operator.lexeme) })
                             }
                         }
                     },
@@ -142,7 +142,7 @@ impl Expr {
                                 Ok(Literal::Bool(a > b))
                             },
                             (_, _) => {
-                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operand {}", operator.lexeme) })
+                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operator {} on non-numbers", operator.lexeme) })
                             }
                         }
                     },
@@ -152,7 +152,7 @@ impl Expr {
                                 Ok(Literal::Bool(a <= b))
                             },
                             (_, _) => {
-                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operand {}", operator.lexeme) })
+                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operator {} on non-numbers", operator.lexeme) })
                             }
                         }
                     },
@@ -162,7 +162,7 @@ impl Expr {
                                 Ok(Literal::Bool(a < b))
                             },
                             (_, _) => {
-                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operand {}", operator.lexeme) })
+                                Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operator {} on non-numbers", operator.lexeme) })
                             }
                         }
                     },
@@ -217,7 +217,7 @@ impl Expr {
                         Err(
                             EvaluationError {
                                 line_no: operator.line,
-                                message: format!("Failed to parse binary expression with operand {}", operator.lexeme)
+                                message: format!("Failed to parse binary expression with operator {}", operator.lexeme)
                             }
                         )
                     }
