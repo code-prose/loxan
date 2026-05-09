@@ -96,7 +96,11 @@ impl Expr {
                     TokenType::Slash => {
                         match (left, right) {
                             (Literal::Number(a), Literal::Number(b)) => {
-                                Ok(Literal::Number(a / b))
+                                if b == 0.0 {
+                                    Err(EvaluationError { line_no: operator.line, message: String::from("Division by 0") })
+                                } else {
+                                    Ok(Literal::Number(a / b))
+                                }
                             },
                             (_, _) => {
                                 Err(EvaluationError { line_no: operator.line, message: format!("Cannot evaluate binary expression with operator {} on non-numbers", operator.lexeme) })
