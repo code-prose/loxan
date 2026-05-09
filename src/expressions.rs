@@ -210,6 +210,9 @@ impl Expr {
                             }
                         }
                     },
+                    TokenType::Comma => {
+                        Ok(right)
+                    },
                     _ => {
                         Err(
                             EvaluationError {
