@@ -9,14 +9,15 @@ use crate::scanner::Scanner;
 
 #[allow(dead_code)]
 pub struct Rlox {
-    pub had_error: bool
+    pub had_error: bool,
+    pub had_runtime_error: bool
 }
 
 #[allow(dead_code)]
 impl Rlox {
 
     pub fn new() -> Self {
-        Self { had_error: false }
+        Self { had_error: false, had_runtime_error: false }
     }
 
     pub fn main(&mut self) ->  io::Result<()> {
@@ -39,6 +40,7 @@ impl Rlox {
         Rlox::run(self, source, &mut std::io::stdout())?;
 
         if self.had_error { std::process::exit(65) }
+        if self.had_runtime_error { std::process::exit(70) }
 
         Ok(())
     }
@@ -79,6 +81,7 @@ impl Rlox {
                 },
                 Err(e) => {
                     self.error(e.line_no, e.message);
+                    self.had_runtime_error = true;
                 }
             }
             // writeln!(output, "{}", Expr::pretty_print(&expr)).unwrap();
