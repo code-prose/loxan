@@ -125,26 +125,28 @@ mod tests {
     #[test]
     fn test_expression_grouping() {
         let mut rlox = Rlox::new();
-        let input = b"(3 * 4) - 1\n";
-        let mut output = Vec::new();
+        let input = String::from("(3 * 4) - 1\n");
+        let mut scanner = Scanner::new(input);
+        let tokens = scanner.scan_tokens(&mut rlox);
 
-        let _res = rlox.run_prompt_on(input.as_ref(), &mut output).unwrap();
+        let mut parser = Parser::new(tokens);
 
-        let output_str = String::from_utf8(output).unwrap();
-        assert_eq!(output_str, "> (- (group (* 3 4)) 1)\n> ")
+        let expr = Expr::pretty_print(&parser.parse().unwrap());
+        assert_eq!(expr, "(- (group (* 3 4)) 1)")
 
     }
 
     #[test]
     fn test_comma_grouping() {
         let mut rlox = Rlox::new();
-        let input = b"1, 2\n";
-        let mut output = Vec::new();
+        let input = String::from("1, 2\n");
+        let mut scanner = Scanner::new(input);
+        let tokens = scanner.scan_tokens(&mut rlox);
 
-        let _res = rlox.run_prompt_on(input.as_ref(), &mut output).unwrap();
+        let mut parser = Parser::new(tokens);
 
-        let output_str = String::from_utf8(output).unwrap();
-        assert_eq!(output_str, "> (, 1 2)\n> ")
+        let expr = Expr::pretty_print(&parser.parse().unwrap());
+        assert_eq!(expr, "(, 1 2)")
     }
 
     #[test]
@@ -165,12 +167,14 @@ mod tests {
     #[test]
     fn test_ternary_operator() {
         let mut rlox = Rlox::new();
-        let input = b"1 > 2 ? 3 : 4\n";
-        let mut output = Vec::new();
+        let input = String::from("1 > 2 ? 3 : 4\n");
+        let mut scanner = Scanner::new(input);
+        let tokens = scanner.scan_tokens(&mut rlox);
 
-        let _res = rlox.run_prompt_on(input.as_ref(), &mut output).unwrap();
+        let mut parser = Parser::new(tokens);
 
-        let output_str = String::from_utf8(output).unwrap();
-        assert_eq!(output_str, "> ((> 1 2) ? 3 : 4)\n> ")
+        let expr = Expr::pretty_print(&parser.parse().unwrap());
+
+        assert_eq!(expr, "((> 1 2) ? 3 : 4)")
     }
 }
