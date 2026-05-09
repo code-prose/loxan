@@ -1,9 +1,11 @@
+use std::intrinsics::ub_checks;
+
 use crate::tokens::{self, Literal, Token, TokenType};
 
 #[allow(dead_code)]
 pub struct EvaluationError {
-    line_no: usize,
-    message: String
+    pub line_no: usize,
+    pub message: String
 }
 
 #[allow(dead_code)]

@@ -61,14 +61,30 @@ impl Rlox {
         Ok(())
     }
 
-    fn run(&mut self, source: String, output: &mut impl io::Write) {
+    fn run(&mut self, source: String, output: &mut impl io::Write) -> io::Result<()> {
         let mut scanner = Scanner::new(source);
         let tokens: Vec<Token> = scanner.scan_tokens(self);
 
         let mut parser = Parser::new(tokens);
         if let Some(expr) = parser.parse() {
-            writeln!(output, "{}", Expr::pretty_print(&expr)).unwrap();
+            let res = Expr::evaluate(&expr);
+            match res {
+                Ok(v) => {
+                    match v {
+                        Literal::Number(n) => writeln!(output, "{}", n)?,
+                        Literal::Str(s) => writeln!(output, "{}", s)?,
+                        Literal::Bool(b) => writeln!(output, "{}", b)?,
+                        Literal::Nil => writeln!(output, "{}", "nil")?,
+                    };
+                },
+                Err(e) => {
+                    self.error(e.line_no, e.message);
+                }
+            }
+            // writeln!(output, "{}", Expr::pretty_print(&expr)).unwrap();
         }
+
+        Ok(())
 
         // for token in tokens.iter() {
         //     println!("{token:?}")
