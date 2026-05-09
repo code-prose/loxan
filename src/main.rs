@@ -1,4 +1,3 @@
-mod ast;
 mod expressions;
 mod interpreter;
 mod parser;

@@ -1,6 +1,4 @@
-use std::intrinsics::ub_checks;
-
-use crate::tokens::{self, Literal, Token, TokenType};
+use crate::tokens::{Literal, Token, TokenType};
 
 #[allow(dead_code)]
 pub struct EvaluationError {
