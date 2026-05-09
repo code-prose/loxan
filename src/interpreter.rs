@@ -1,10 +1,10 @@
 use std::env;
-use std::io::{self, BufRead, Write};
+use std::io::{self, BufRead};
 use std::fs;
 
 use crate::expressions::{Expr};
 use crate::parser::Parser;
-use crate::tokens::{TokenType, Token, Literal};
+use crate::tokens::{Token, Literal};
 use crate::scanner::Scanner;
 
 #[allow(dead_code)]
