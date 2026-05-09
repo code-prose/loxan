@@ -84,7 +84,6 @@ impl Rlox {
                     self.had_runtime_error = true;
                 }
             }
-            // writeln!(output, "{}", Expr::pretty_print(&expr)).unwrap();
         }
 
         Ok(())
