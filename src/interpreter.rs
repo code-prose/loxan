@@ -175,7 +175,7 @@ mod tests {
     }
 
     #[test]
-    fn test_expr_evaluation() {
+    fn test_ternary_expr_evaluation() {
         let mut rlox = Rlox::new();
         let input = b"1 > 2 ? 3 : 4\n";
         let mut output = Vec::new();
@@ -185,5 +185,44 @@ mod tests {
         let output_str = String::from_utf8(output).unwrap();
 
         assert_eq!(output_str, "> 4\n> ")
+    }
+
+    #[test]
+    fn test_bool_expr_evaluation() {
+        let mut rlox = Rlox::new();
+        let input = b"true == false\n";
+        let mut output = Vec::new();
+
+        let _res = rlox.run_prompt_on(input.as_ref(), &mut output).unwrap();
+
+        let output_str = String::from_utf8(output).unwrap();
+
+        assert_eq!(output_str, "> false\n> ")
+    }
+
+    #[test]
+    fn test_arithmetic_expr_evaluation() {
+        let mut rlox = Rlox::new();
+        let input = b"1 + 2\n";
+        let mut output = Vec::new();
+
+        let _res = rlox.run_prompt_on(input.as_ref(), &mut output).unwrap();
+
+        let output_str = String::from_utf8(output).unwrap();
+
+        assert_eq!(output_str, "> 3\n> ")
+    }
+
+    #[test]
+    fn test_grouping_arithmetic_expr_evaluation() {
+        let mut rlox = Rlox::new();
+        let input = b"(1 + 2) * 4\n";
+        let mut output = Vec::new();
+
+        let _res = rlox.run_prompt_on(input.as_ref(), &mut output).unwrap();
+
+        let output_str = String::from_utf8(output).unwrap();
+
+        assert_eq!(output_str, "> 12\n> ")
     }
 }
