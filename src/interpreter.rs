@@ -177,4 +177,17 @@ mod tests {
 
         assert_eq!(expr, "((> 1 2) ? 3 : 4)")
     }
+
+    #[test]
+    fn test_expr_evaluation() {
+        let mut rlox = Rlox::new();
+        let input = b"1 > 2 ? 3 : 4\n";
+        let mut output = Vec::new();
+
+        let _res = rlox.run_prompt_on(input.as_ref(), &mut output).unwrap();
+
+        let output_str = String::from_utf8(output).unwrap();
+
+        assert_eq!(output_str, "> 4\n> ")
+    }
 }
