@@ -1,6 +1,7 @@
 use crate::{
     expressions::Expr,
     tokens::{Literal, Token, TokenType},
+    statements::Stmt,
 };
 
 #[allow(dead_code)]
@@ -35,6 +36,15 @@ impl Parser {
                 None
             }
         }
+    }
+
+    fn expression_statement(&mut self) -> Stmt {
+        todo!("")
+    }
+
+    fn print_statement(&mut self) -> Stmt {
+        todo!("")
+
     }
 
     fn error(err: ParsingError) {

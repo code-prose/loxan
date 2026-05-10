@@ -1,7 +1,19 @@
-struct Statement {
+use crate::expressions::Expr;
+
+pub enum Stmt {
+    Expression {
+        expression: Expr
+    },
+    Print {
+        expression: Expr
+    }
 
 }
 
-impl Statement {
+impl Stmt {
+    fn evaluate(&mut self) {
 
+    }
 }
+
+
