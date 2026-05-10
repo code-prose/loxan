@@ -32,6 +32,8 @@ impl Parser {
         let mut statements: Vec<Stmt> = Vec::new();
         while !self.is_at_end() {
             // maybe I want to handle this result here instead of pushing it further up
+            // what could possible be here? ParsingError? I should probably handle this in the
+            // parser
             statements.push(self.statement()?); 
         }
 
@@ -60,7 +62,6 @@ impl Parser {
         self.consume(TokenType::Semicolon, String::from("Expect ';' after value."));
 
         Ok(Stmt::Print { expression: expr })
-
     }
 
     fn error(err: ParsingError) {
