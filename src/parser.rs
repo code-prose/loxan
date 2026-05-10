@@ -28,22 +28,38 @@ impl Parser {
         }
     }
 
-    pub fn parse(&mut self) -> Option<Box<Expr>> {
-        match self.expression() {
-            Ok(v) => return Some(v),
-            Err(_) => {
-                println!("Couldn't parse expression");
-                None
-            }
+    pub fn parse(&mut self) -> Result<Vec<Stmt>, ParsingError> {
+        let mut statements: Vec<Stmt> = Vec::new();
+        while !self.is_at_end() {
+            // maybe I want to handle this result here instead of pushing it further up
+            statements.push(self.statement()?); 
+        }
+
+        Ok(statements)
+    }
+
+    fn statement(&mut self) -> Result<Stmt, ParsingError> {
+        if self.match_tokens(&[TokenType::Print]) {
+            self.print_statement()
+        } else {
+            self.expression_statement()
         }
     }
 
-    fn expression_statement(&mut self) -> Stmt {
-        todo!("")
+    fn expression_statement(&mut self) -> Result<Stmt, ParsingError> {
+        let expr = self.expression()?;
+
+        self.consume(TokenType::Semicolon, String::from("Expect ';' after value."));
+
+        Ok(Stmt::Expression { expression: expr })
     }
 
-    fn print_statement(&mut self) -> Stmt {
-        todo!("")
+    fn print_statement(&mut self) -> Result<Stmt, ParsingError> {
+        let expr = self.expression()?;
+
+        self.consume(TokenType::Semicolon, String::from("Expect ';' after value."));
+
+        Ok(Stmt::Print { expression: expr })
 
     }
 

@@ -2,10 +2,10 @@ use crate::expressions::Expr;
 
 pub enum Stmt {
     Expression {
-        expression: Expr
+        expression: Box<Expr>
     },
     Print {
-        expression: Expr
+        expression: Box<Expr>
     }
 
 }
