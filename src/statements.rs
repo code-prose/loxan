@@ -1,18 +1,18 @@
-use crate::expressions::EvaluationError;
-use crate::{expressions::Expr, tokens::Literal};
 use std::io;
 
+use crate::expressions::{EvaluationError, Expr};
+use crate::tokens::{Literal, Token};
 
 pub struct RuntimeError {
     pub line_no: usize,
-    pub message: String
+    pub message: String,
 }
 
 impl From<EvaluationError> for RuntimeError {
     fn from(err: EvaluationError) -> Self {
         RuntimeError {
             line_no: err.line_no,
-            message: err.message
+            message: err.message,
         }
     }
 }
@@ -20,6 +20,7 @@ impl From<EvaluationError> for RuntimeError {
 pub enum Stmt {
     Expression { expression: Box<Expr> },
     Print { expression: Box<Expr> },
+    Var { name: Token, initializer: Box<Expr> },
 }
 
 impl Stmt {
@@ -28,10 +29,8 @@ impl Stmt {
             Stmt::Expression { expression } => {
                 let value = Expr::evaluate(expression.as_ref());
                 match value {
-                    Ok(_) => {},
-                    Err(e) => {
-                        return Err(e.into())
-                    }
+                    Ok(_) => {}
+                    Err(e) => return Err(e.into()),
                 };
 
                 Ok(())
@@ -46,13 +45,15 @@ impl Stmt {
                             Literal::Str(s) => writeln!(output, "{}", s),
                             Literal::Nil => writeln!(output, "{}", "nil"),
                         };
-                    },
-                    Err(e) => {
-                        return Err(e.into())
                     }
+                    Err(e) => return Err(e.into()),
                 }
                 Ok(())
+            },
+            Stmt::Var { name, initializer } =>  {
+                todo!("")
             }
+
         }
     }
 }
