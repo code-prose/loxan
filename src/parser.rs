@@ -34,7 +34,7 @@ impl Parser {
             // maybe I want to handle this result here instead of pushing it further up
             // what could possible be here? ParsingError? I should probably handle this in the
             // parser
-            statements.push(self.statement()?); 
+            statements.push(self.statement()?);
         }
 
         Ok(statements)
