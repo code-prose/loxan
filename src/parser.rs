@@ -35,6 +35,7 @@ impl Parser {
             // what could possible be here? ParsingError? I should probably handle this in the
             // parser
             statements.push(self.statement()?);
+            // wants me to do statements.push(self.declaration()?) ???
         }
 
         Ok(statements)
@@ -46,6 +47,10 @@ impl Parser {
         } else {
             self.expression_statement()
         }
+    }
+
+    fn declaration(&mut self) -> Result<Stmt, ParsingError> {
+        todo!("")
     }
 
     fn expression_statement(&mut self) -> Result<Stmt, ParsingError> {
