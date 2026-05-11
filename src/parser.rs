@@ -51,7 +51,7 @@ impl Parser {
     fn expression_statement(&mut self) -> Result<Stmt, ParsingError> {
         let expr = self.expression()?;
 
-        self.consume(TokenType::Semicolon, String::from("Expect ';' after value."));
+        self.consume(TokenType::Semicolon, String::from("Expect ';' after value."))?;
 
         Ok(Stmt::Expression { expression: expr })
     }
@@ -59,7 +59,7 @@ impl Parser {
     fn print_statement(&mut self) -> Result<Stmt, ParsingError> {
         let expr = self.expression()?;
 
-        self.consume(TokenType::Semicolon, String::from("Expect ';' after value."));
+        self.consume(TokenType::Semicolon, String::from("Expect ';' after value."))?;
 
         Ok(Stmt::Print { expression: expr })
     }
