@@ -14,9 +14,9 @@ pub struct Parser {
 // token to raise with
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
-struct ParsingError {
-    peek_token: Token,
-    message: String,
+pub struct ParsingError {
+    pub peek_token: Token,
+    pub message: String,
 }
 
 #[allow(dead_code)]
