@@ -30,6 +30,9 @@ pub enum Expr {
     Grouping {
         expr: Box<Expr>,
     },
+    Variable {
+        name: Token
+    },
 }
 
 
@@ -53,6 +56,9 @@ impl Expr {
                     Literal::Nil => String::from("nil")
                 }
             },
+            Expr::Variable { name } => {
+                todo!("")
+            }
         }
     }
 
@@ -237,6 +243,7 @@ impl Expr {
                 }
             },
             Expr::Grouping { expr } => Self::evaluate(expr),
+            Expr::Variable { name } => todo!("")
         }
 
     }
