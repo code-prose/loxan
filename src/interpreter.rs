@@ -69,7 +69,6 @@ impl Rlox {
         let tokens: Vec<Token> = scanner.scan_tokens(self);
 
         let mut parser = Parser::new(tokens);
-        // need to handle this parsing error probably
         let statements = parser.parse();
         match statements {
             Ok(v) => {
@@ -80,24 +79,6 @@ impl Rlox {
             }
         }
 
-        // if let Some(expr) = parser.parse() {
-        //     let res = Expr::evaluate(&expr);
-        //     match res {
-        //         Ok(v) => {
-        //             match v {
-        //                 Literal::Number(n) => writeln!(output, "{}", n)?,
-        //                 Literal::Str(s) => writeln!(output, "{}", s)?,
-        //                 Literal::Bool(b) => writeln!(output, "{}", b)?,
-        //                 Literal::Nil => writeln!(output, "{}", "nil")?,
-        //             };
-        //         },
-        //         Err(e) => {
-        //             self.error(e.line_no, e.message);
-        //             self.had_runtime_error = true;
-        //         }
-        //     }
-        // }
-        //
         Ok(())
     }
 
