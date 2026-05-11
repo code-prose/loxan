@@ -3,9 +3,9 @@ use crate::{expressions::Expr, tokens::Literal};
 use std::io;
 
 
-struct RuntimeError {
-    line_no: usize,
-    message: String
+pub struct RuntimeError {
+    pub line_no: usize,
+    pub message: String
 }
 
 impl From<EvaluationError> for RuntimeError {
@@ -23,7 +23,7 @@ pub enum Stmt {
 }
 
 impl Stmt {
-    pub fn evaluate(stmt: Stmt, output: &mut impl io::Write) -> Result<(), RuntimeError> {
+    pub fn execute(stmt: Stmt, output: &mut impl io::Write) -> Result<(), RuntimeError> {
         match stmt {
             Stmt::Expression { expression } => {
                 let value = Expr::evaluate(expression.as_ref());
