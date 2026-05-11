@@ -70,6 +70,7 @@ impl Rlox {
 
         let mut parser = Parser::new(tokens);
         let statements = parser.parse();
+
         match statements {
             Ok(v) => {
                 self.interpret(v, output);
