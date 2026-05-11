@@ -4,6 +4,7 @@ use std::fs;
 
 use crate::expressions::{Expr};
 use crate::parser::Parser;
+use crate::statements::Stmt;
 use crate::tokens::{Token, Literal};
 use crate::scanner::Scanner;
 
@@ -68,25 +69,48 @@ impl Rlox {
         let tokens: Vec<Token> = scanner.scan_tokens(self);
 
         let mut parser = Parser::new(tokens);
-        if let Some(expr) = parser.parse() {
-            let res = Expr::evaluate(&expr);
-            match res {
-                Ok(v) => {
-                    match v {
-                        Literal::Number(n) => writeln!(output, "{}", n)?,
-                        Literal::Str(s) => writeln!(output, "{}", s)?,
-                        Literal::Bool(b) => writeln!(output, "{}", b)?,
-                        Literal::Nil => writeln!(output, "{}", "nil")?,
-                    };
-                },
-                Err(e) => {
-                    self.error(e.line_no, e.message);
-                    self.had_runtime_error = true;
-                }
+        // need to handle this parsing error probably
+        let statements = parser.parse();
+        match statements {
+            Ok(v) => {
+                self.interpret(v, output);
+            },
+            Err(e) => {
+                self.report(0, e.peek_token.lexeme, e.message);
             }
         }
 
+        // if let Some(expr) = parser.parse() {
+        //     let res = Expr::evaluate(&expr);
+        //     match res {
+        //         Ok(v) => {
+        //             match v {
+        //                 Literal::Number(n) => writeln!(output, "{}", n)?,
+        //                 Literal::Str(s) => writeln!(output, "{}", s)?,
+        //                 Literal::Bool(b) => writeln!(output, "{}", b)?,
+        //                 Literal::Nil => writeln!(output, "{}", "nil")?,
+        //             };
+        //         },
+        //         Err(e) => {
+        //             self.error(e.line_no, e.message);
+        //             self.had_runtime_error = true;
+        //         }
+        //     }
+        // }
+        //
         Ok(())
+    }
+
+    fn interpret(&mut self, stmts: Vec<Stmt>, output: &mut impl io::Write) {
+        for stmt in stmts {
+            match Stmt::execute(stmt, output) {
+                Ok(_) => {},
+                Err(e) => {
+                    self.had_runtime_error = true;
+                    self.report(e.line_no, String::from(""), e.message);
+                }
+            }
+        }
     }
 
     // Perhaps something like this in the future
@@ -97,6 +121,7 @@ impl Rlox {
     pub fn report(&mut self, line: usize, loc: String, message: String) {
         println!("[line {line}] Error {loc}: {message}");
         self.had_error = true;
+        self.had_runtime_error = false;
     }
 
     pub fn error(&mut self, line: usize, message: String) {
