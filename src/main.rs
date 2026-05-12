@@ -4,6 +4,7 @@ mod parser;
 mod scanner;
 mod tokens;
 mod statements;
+mod environment;
 
 use crate::interpreter::Rlox;
 
