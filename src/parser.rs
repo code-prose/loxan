@@ -286,6 +286,10 @@ impl Parser {
             }
         }
 
+        if self.match_tokens(&[TokenType::Identifier]) {
+            return Ok(Box::new(Expr::Variable { name: self.previous() }))
+        }
+
         if self.match_tokens(&[TokenType::LeftParen]) {
             let expr = self.expression()?;
             self.consume(
