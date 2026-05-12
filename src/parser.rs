@@ -34,7 +34,7 @@ impl Parser {
             // maybe I want to handle this result here instead of pushing it further up
             // what could possible be here? ParsingError? I should probably handle this in the
             // parser
-            statements.push(self.statement()?);
+            statements.push(self.declaration()?);
             // wants me to do statements.push(self.declaration()?) ???
         }
 
@@ -50,7 +50,28 @@ impl Parser {
     }
 
     fn declaration(&mut self) -> Result<Stmt, ParsingError> {
+        if self.match_tokens(&[TokenType::Var]) {
+            match self.var_declaration() {
+                Ok(v) => return Ok(v),
+                Err(e) => {
+                    self.synchronize();
+
+                }
+            }
+        }
         todo!("")
+    }
+
+    fn var_declaration(&mut self) -> Result<Stmt, ParsingError> {
+        let name = self.consume(TokenType::Identifier, String::from("Expected a variable name"))?;
+
+        if self.match_tokens(&[TokenType::Equal]) {
+            self.consume(TokenType::Semicolon, String::from("Expected ';' after variable declaration"))?;
+            Ok(Stmt::Var { name: name, initializer: Some(self.expression()?) })
+        } else { 
+            self.consume(TokenType::Semicolon, String::from("Expected ';' after variable declaration"))?;
+            Ok(Stmt::Var { name: name, initializer: None })
+        }
     }
 
     fn expression_statement(&mut self) -> Result<Stmt, ParsingError> {
