@@ -20,7 +20,7 @@ impl From<EvaluationError> for RuntimeError {
 pub enum Stmt {
     Expression { expression: Box<Expr> },
     Print { expression: Box<Expr> },
-    Var { name: Token, initializer: Box<Expr> },
+    Var { name: Token, initializer: Option<Box<Expr>> },
 }
 
 impl Stmt {
