@@ -2,6 +2,7 @@ use std::env;
 use std::io::{self, BufRead};
 use std::fs;
 
+use crate::environment::Environment;
 use crate::expressions::{Expr};
 use crate::parser::Parser;
 use crate::statements::Stmt;
@@ -11,14 +12,15 @@ use crate::scanner::Scanner;
 #[allow(dead_code)]
 pub struct Rlox {
     pub had_error: bool,
-    pub had_runtime_error: bool
+    pub had_runtime_error: bool,
+    pub env: Environment
 }
 
 #[allow(dead_code)]
 impl Rlox {
 
     pub fn new() -> Self {
-        Self { had_error: false, had_runtime_error: false }
+        Self { had_error: false, had_runtime_error: false, env: Environment::new() }
     }
 
     pub fn main(&mut self) ->  io::Result<()> {
