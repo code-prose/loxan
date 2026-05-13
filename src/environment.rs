@@ -1,6 +1,4 @@
-// he wants map and hashmap?
-// what is a map?
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::{cell::RefCell, collections::HashMap};
 
 use crate::tokens::Literal;
 
