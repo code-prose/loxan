@@ -7,6 +7,7 @@ use crate::parser::Parser;
 use crate::scanner::Scanner;
 use crate::statements::Stmt;
 use crate::tokens::Token;
+use crate::expressions::Expr;
 
 #[allow(dead_code)]
 pub struct Rlox {
