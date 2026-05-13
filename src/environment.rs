@@ -1,11 +1,14 @@
-use std::{cell::RefCell, collections::HashMap};
+use std::cell::RefCell;
+use std::collections::HashMap;
 
 use crate::tokens::Literal;
 
+#[allow(dead_code)]
 pub struct Environment {
     values: HashMap<String, RefCell<Literal>>
 }
 
+#[allow(dead_code)]
 impl Environment {
     // I might need to convert it to a RefCell in this function
     fn define(&mut self, name: String, value: RefCell<Literal>) {
