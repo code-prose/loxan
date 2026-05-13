@@ -1,9 +1,15 @@
-use crate::tokens::{Literal, Token, TokenType};
+use crate::{environment::Environment, statements::RuntimeError, tokens::{Literal, Token, TokenType}};
 
 #[allow(dead_code)]
 pub struct EvaluationError {
     pub line_no: usize,
     pub message: String
+}
+
+impl From<RuntimeError> for EvaluationError  {
+    fn from(value: RuntimeError) -> Self {
+       EvaluationError { line_no: value.line_no, message: value.message } 
+    }
 }
 
 #[allow(dead_code)]
@@ -48,25 +54,30 @@ impl Expr {
             Expr::Ternary { left, operator, middle, right } => {
                 format!("({} ? {} {} {})", Self::pretty_print(left), Self::pretty_print(middle), operator.lexeme, Self::pretty_print(right))
             },
-            Expr::Literal { literal } => {
-                match literal {
-                    Literal::Number(n) => format!("{n}"),
-                    Literal::Str(s) => format!("{s}"),
-                    Literal::Bool(b) => format!("{b}"),
-                    Literal::Nil => String::from("nil")
-                }
-            },
+            Expr::Literal { literal } => Self::pretty_print_literal(literal),
             Expr::Variable { name } => {
-                todo!("")
+                match &name.literal {
+                    Some(v) => Self::pretty_print_literal(&v),
+                    None => String::from("How did you get here?")
+                }
             }
         }
     }
 
-    pub fn evaluate(expr: &Expr) -> Result<Literal, EvaluationError> {
+    pub fn pretty_print_literal(literal: &Literal) -> String {
+        match literal {
+            Literal::Number(n) => format!("{n}"),
+            Literal::Str(s) => format!("{s}"),
+            Literal::Bool(b) => format!("{b}"),
+            Literal::Nil => String::from("nil")
+        }
+    }
+
+    pub fn evaluate(expr: &Expr, env: &mut Environment) -> Result<Literal, EvaluationError> {
         match expr {
             Expr::Literal { literal } => Ok(literal.clone()),
             Expr::Unary { operator, expr } => {
-                let right = Self::evaluate(expr)?;
+                let right = Self::evaluate(expr, env)?;
                 match operator.token_type {
                     TokenType::Minus => {
                         match right {
@@ -85,8 +96,8 @@ impl Expr {
                 }
             },
             Expr::Binary { left, operator, right } => {
-                let right = Self::evaluate(right.as_ref())?;
-                let left = Self::evaluate(left.as_ref())?;
+                let right = Self::evaluate(right.as_ref(), env)?;
+                let left = Self::evaluate(left.as_ref(), env)?;
 
                 match operator.token_type {
                     TokenType::Star => {
@@ -234,16 +245,20 @@ impl Expr {
                 }
             },
             Expr::Ternary { left, middle, right, .. } => {
-                let left = Self::evaluate(left)?;
+                let left = Self::evaluate(left, env)?;
 
                 if Self::is_truthy(&left) {
-                    Self::evaluate(middle)
+                    Self::evaluate(middle, env)
                 } else {
-                    Self::evaluate(right)
+                    Self::evaluate(right, env)
                 }
             },
-            Expr::Grouping { expr } => Self::evaluate(expr),
-            Expr::Variable { name } => todo!("")
+            Expr::Grouping { expr } => Self::evaluate(expr, env),
+            Expr::Variable { name } => {
+                let literal_ptr = env.get(&name.lexeme)?;
+                let tok = literal_ptr.borrow().clone();
+                Ok(tok)
+            }
         }
 
     }
