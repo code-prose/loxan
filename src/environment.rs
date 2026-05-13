@@ -11,6 +11,11 @@ pub struct Environment {
 
 #[allow(dead_code)]
 impl Environment {
+    fn new() -> Self {
+        Self {
+            values: HashMap::new()
+        }
+    }
     // I might need to convert it to a RefCell in this function
     fn define(&mut self, name: String, value: RefCell<Literal>) {
         self.values.insert(name, value);
