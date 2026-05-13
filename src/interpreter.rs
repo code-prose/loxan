@@ -1,40 +1,42 @@
 use std::env;
-use std::io::{self, BufRead};
 use std::fs;
+use std::io::{self, BufRead};
 
 use crate::environment::Environment;
-use crate::expressions::{Expr};
 use crate::parser::Parser;
-use crate::statements::Stmt;
-use crate::tokens::{Token, Literal};
 use crate::scanner::Scanner;
+use crate::statements::Stmt;
+use crate::tokens::Token;
 
 #[allow(dead_code)]
 pub struct Rlox {
     pub had_error: bool,
     pub had_runtime_error: bool,
-    pub env: Environment
+    pub env: Environment,
 }
 
 #[allow(dead_code)]
 impl Rlox {
-
     pub fn new() -> Self {
-        Self { had_error: false, had_runtime_error: false, env: Environment::new() }
+        Self {
+            had_error: false,
+            had_runtime_error: false,
+            env: Environment::new(),
+        }
     }
 
-    pub fn main(&mut self) ->  io::Result<()> {
+    pub fn main(&mut self) -> io::Result<()> {
         let args: Vec<String> = env::args().collect();
 
         if args.len() > 2 {
-              println!("Usage: jlox [script]");
-              std::process::exit(64) 
+            println!("Usage: jlox [script]");
+            std::process::exit(64)
         } else if args.len() == 2 {
             self.run_file(&args[0])?
         } else {
             self.run_prompt()?
         }
-        
+
         Ok(())
     }
 
@@ -42,8 +44,12 @@ impl Rlox {
         let source = fs::read_to_string(path).unwrap();
         Rlox::run(self, source, &mut std::io::stdout())?;
 
-        if self.had_error { std::process::exit(65) }
-        if self.had_runtime_error { std::process::exit(70) }
+        if self.had_error {
+            std::process::exit(65)
+        }
+        if self.had_runtime_error {
+            std::process::exit(70)
+        }
 
         Ok(())
     }
@@ -52,14 +58,20 @@ impl Rlox {
         self.run_prompt_on(io::stdin(), io::stdout())
     }
 
-    fn run_prompt_on(&mut self, input: impl io::Read, mut output: impl io::Write) -> io::Result<()> {
+    fn run_prompt_on(
+        &mut self,
+        input: impl io::Read,
+        mut output: impl io::Write,
+    ) -> io::Result<()> {
         let mut reader = io::BufReader::new(input);
         loop {
             write!(output, "> ")?;
             output.flush()?;
             let mut line = String::new();
-            if reader.read_line(&mut line)? == 0 || line.trim().is_empty() { break }
-            self.run(line.trim_end().to_string(), &mut output)?; 
+            if reader.read_line(&mut line)? == 0 || line.trim().is_empty() {
+                break;
+            }
+            self.run(line.trim_end().to_string(), &mut output)?;
             self.had_error = false;
         }
 
@@ -76,7 +88,7 @@ impl Rlox {
         match statements {
             Ok(v) => {
                 self.interpret(v, output);
-            },
+            }
             Err(e) => {
                 self.report(0, e.peek_token.lexeme, e.message);
             }
@@ -88,7 +100,7 @@ impl Rlox {
     fn interpret(&mut self, stmts: Vec<Stmt>, output: &mut impl io::Write) {
         for stmt in stmts {
             match Stmt::execute(stmt, output) {
-                Ok(_) => {},
+                Ok(_) => {}
                 Err(e) => {
                     self.had_runtime_error = true;
                     self.report(e.line_no, String::from(""), e.message);
@@ -140,7 +152,6 @@ mod tests {
 
         let expr = Expr::pretty_print(&parser.parse().unwrap());
         assert_eq!(expr, "(- (group (* 3 4)) 1)")
-
     }
 
     #[test]
