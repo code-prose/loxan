@@ -1,6 +1,7 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
 
+use crate::statements::RuntimeError;
 use crate::tokens::Literal;
 
 #[allow(dead_code)]
@@ -15,8 +16,13 @@ impl Environment {
         self.values.insert(name, value);
     }
 
-    fn get(&mut self, name: String) -> &RefCell<Literal> {
-        self.values.get(&name).expect(format!("Variable '{name}' is undefined.").as_str())
+    fn get(&mut self, name: String) -> Result<&RefCell<Literal>, RuntimeError> {
+        match self.values.get(&name) {
+            Some(v) => Ok(v),
+            // I need to figure out line_no or construct a different error
+            None => Err(RuntimeError { line_no: 0, message: format!("Variable '{name}' is undefined.")})
+
+        }
     }
 }
 
