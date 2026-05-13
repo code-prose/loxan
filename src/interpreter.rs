@@ -99,7 +99,7 @@ impl Rlox {
 
     fn interpret(&mut self, stmts: Vec<Stmt>, output: &mut impl io::Write) {
         for stmt in stmts {
-            match Stmt::execute(stmt, output) {
+            match Stmt::execute(stmt, output, &mut self.env) {
                 Ok(_) => {}
                 Err(e) => {
                     self.had_runtime_error = true;
