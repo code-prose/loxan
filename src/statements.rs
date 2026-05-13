@@ -1,5 +1,7 @@
+use std::cell::RefCell;
 use std::io;
 
+use crate::environment::Environment;
 use crate::expressions::{EvaluationError, Expr};
 use crate::tokens::{Literal, Token};
 
@@ -24,7 +26,7 @@ pub enum Stmt {
 }
 
 impl Stmt {
-    pub fn execute(stmt: Stmt, output: &mut impl io::Write) -> Result<(), RuntimeError> {
+    pub fn execute(stmt: Stmt, output: &mut impl io::Write, env: &mut Environment) -> Result<(), RuntimeError> {
         match stmt {
             Stmt::Expression { expression } => {
                 let value = Expr::evaluate(expression.as_ref());
@@ -50,10 +52,17 @@ impl Stmt {
                 }
                 Ok(())
             },
-            Stmt::Var { name, initializer } =>  {
-                todo!("")
+            Stmt::Var { name, initializer } => {
+                match initializer {
+                    Some(v) => {
+                       env.define(name.lexeme, RefCell::new(Expr::evaluate(v.as_ref())?)); 
+                    },
+                    None => {
+                        env.define(name.lexeme, RefCell::new(Literal::Nil));
+                    }
+                }
+                Ok(())
             }
-
         }
     }
 }
