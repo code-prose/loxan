@@ -29,7 +29,7 @@ impl Stmt {
     pub fn execute(stmt: Stmt, output: &mut impl io::Write, env: &mut Environment) -> Result<(), RuntimeError> {
         match stmt {
             Stmt::Expression { expression } => {
-                let value = Expr::evaluate(expression.as_ref());
+                let value = Expr::evaluate(expression.as_ref(), env);
                 match value {
                     Ok(_) => {}
                     Err(e) => return Err(e.into()),
@@ -38,7 +38,7 @@ impl Stmt {
                 Ok(())
             }
             Stmt::Print { expression } => {
-                let value = Expr::evaluate(expression.as_ref());
+                let value = Expr::evaluate(expression.as_ref(), env);
                 match value {
                     Ok(tok) => {
                         match tok {
@@ -55,7 +55,8 @@ impl Stmt {
             Stmt::Var { name, initializer } => {
                 match initializer {
                     Some(v) => {
-                       env.define(name.lexeme, RefCell::new(Expr::evaluate(v.as_ref())?)); 
+                        let expr_ptr = RefCell::new(Expr::evaluate(v.as_ref(), env)?);
+                        env.define(name.lexeme, expr_ptr); 
                     },
                     None => {
                         env.define(name.lexeme, RefCell::new(Literal::Nil));
