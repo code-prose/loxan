@@ -41,6 +41,7 @@ impl Stmt {
                 let value = Expr::evaluate(expression.as_ref(), env);
                 match value {
                     Ok(tok) => {
+                        // need to handle this lol
                         match tok {
                             Literal::Number(n) => writeln!(output, "{}", n),
                             Literal::Bool(b) => writeln!(output, "{}", b),
