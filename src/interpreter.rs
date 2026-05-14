@@ -7,7 +7,6 @@ use crate::parser::Parser;
 use crate::scanner::Scanner;
 use crate::statements::Stmt;
 use crate::tokens::Token;
-use crate::expressions::Expr;
 
 #[allow(dead_code)]
 pub struct Rlox {
@@ -129,6 +128,7 @@ impl Rlox {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::expressions::Expr;
 
     #[test]
     fn test_run_prompt_on_input() {
@@ -142,6 +142,7 @@ mod tests {
         assert!(!rlox.had_error);
     }
 
+    // need to refactor these tests to pass in expr
     #[test]
     fn test_expression_grouping() {
         let mut rlox = Rlox::new();
