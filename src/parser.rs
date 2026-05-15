@@ -12,6 +12,7 @@ pub struct Parser {
 
 // I should let peek_token be an Option<_> and then I can handle the cases where I don't have a
 // token to raise with
+// what is this?
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct ParsingError {
