@@ -1,4 +1,5 @@
 use crate::{environment::Environment, statements::RuntimeError, tokens::{Literal, Token, TokenType}};
+use std::cell::RefCell;
 
 #[allow(dead_code)]
 pub struct EvaluationError {
@@ -267,7 +268,17 @@ impl Expr {
                 Ok(tok)
             },
             Expr::Assign { name, expr } => {
-                todo!()
+                // This will propogate the runtime error up the chain... But do I want a custom
+                // runtime error? Probably...
+                // env.get(&name.lexeme)?;
+                match env.get(&name.lexeme) {
+                    Ok(_) => {},
+                    Err(_) => { return Err(EvaluationError { line_no: 0, message: format!("Undefined variable '{}'", &name.lexeme)}) }
+                }
+
+                let val = Self::evaluate(expr, env)?;
+                env.define(name.lexeme.clone(), RefCell::new(val.clone()));
+                Ok(val)
             }
         }
 
