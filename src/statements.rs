@@ -69,7 +69,7 @@ impl Stmt {
     }
 
     // how do you write trait bounds???
-    pub fn<T: impl io::Write> pretty_print(stmt: Stmt, output: &mut T, env: &mut Environment) -> String {
-
-    }
+//     pub fn<T: impl io::Write> pretty_print(stmt: Stmt, output: &mut T, env: &mut Environment) -> String {
+//
+//     }
 }
