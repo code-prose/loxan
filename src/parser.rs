@@ -180,7 +180,20 @@ impl Parser {
     // do I need to insert this into comma?
     // do I need to insert this into ternary in place of equality?
     fn assignment(&mut self) -> Result<Box<Expr>, ParsingError> {
-        todo!()
+        let expr = self.equality()?;
+
+        if self.match_tokens(&[TokenType::Equal]) {
+            let equals = self.previous();
+            let value = self.assignment()?;
+
+            if let Expr::Variable { name } = *expr {
+                return Ok(Box::new(Expr::Assign { name: name.clone(), expr: value }))
+            }
+
+            Self::error(ParsingError {peek_token: equals, message: String::from("Invalid assignment target")});
+        }
+
+        Ok(expr)
     }
 
     fn equality(&mut self) -> Result<Box<Expr>, ParsingError> {
