@@ -18,26 +18,30 @@ pub enum Expr {
     Literal {
         literal: Literal,
     },
-    Ternary {
-        left: Box<Expr>,
+    Unary {
         operator: Token,
-        middle: Box<Expr>,
-        right: Box<Expr>
+        expr: Box<Expr>,
     },
     Binary {
         left: Box<Expr>,
         operator: Token,
         right: Box<Expr>,
     },
-    Unary {
+    Ternary {
+        left: Box<Expr>,
         operator: Token,
-        expr: Box<Expr>,
+        middle: Box<Expr>,
+        right: Box<Expr>
     },
     Grouping {
         expr: Box<Expr>,
     },
     Variable {
         name: Token
+    },
+    Assign {
+        name: Token,
+        expr: Box<Expr>
     },
 }
 
@@ -60,6 +64,9 @@ impl Expr {
                     Some(v) => Self::pretty_print_literal(&v),
                     None => String::from("How did you get here?")
                 }
+            }
+            Expr::Assign { name, expr } => {
+                format!("{}: {}", name.lexeme, Self::pretty_print(expr))
             }
         }
     }
@@ -258,6 +265,9 @@ impl Expr {
                 let literal_ptr = env.get(&name.lexeme)?;
                 let tok = literal_ptr.borrow().clone();
                 Ok(tok)
+            },
+            Expr::Assign { name, expr } => {
+                todo!()
             }
         }
 
