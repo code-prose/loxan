@@ -177,8 +177,6 @@ impl Parser {
         self.comma()
     }
 
-    // do I need to insert this into comma?
-    // do I need to insert this into ternary in place of equality?
     fn assignment(&mut self) -> Result<Box<Expr>, ParsingError> {
         let expr = self.ternary()?;
 
