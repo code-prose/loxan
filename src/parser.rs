@@ -69,14 +69,15 @@ impl Parser {
 
     fn var_declaration(&mut self) -> Result<Stmt, ParsingError> {
         let name = self.consume(TokenType::Identifier, String::from("Expected a variable name"))?;
+        let stmt;
 
         if self.match_tokens(&[TokenType::Equal]) {
-            self.consume(TokenType::Semicolon, String::from("Expected ';' after variable declaration"))?;
-            Ok(Stmt::Var { name: name, initializer: Some(self.expression()?) })
+            stmt = Stmt::Var { name: name, initializer: Some(self.expression()?) };
         } else { 
-            self.consume(TokenType::Semicolon, String::from("Expected ';' after variable declaration"))?;
-            Ok(Stmt::Var { name: name, initializer: None })
+            stmt = Stmt::Var { name: name, initializer: None };
         }
+        self.consume(TokenType::Semicolon, String::from("Expected ';' after variable declaration"))?;
+        Ok(stmt)
     }
 
     fn expression_statement(&mut self) -> Result<Stmt, ParsingError> {
@@ -174,6 +175,12 @@ impl Parser {
 
     fn expression(&mut self) -> Result<Box<Expr>, ParsingError> {
         self.comma()
+    }
+
+    // do I need to insert this into comma?
+    // do I need to insert this into ternary in place of equality?
+    fn assignment(&mut self) -> Result<Box<Expr>, ParsingError> {
+        todo!()
     }
 
     fn equality(&mut self) -> Result<Box<Expr>, ParsingError> {
