@@ -157,7 +157,7 @@ impl Parser {
 
     // C style comma expressions support
     fn comma(&mut self) -> Result<Box<Expr>, ParsingError> {
-        let mut expr = self.ternary()?;
+        let mut expr = self.assignment()?;
 
         while self.match_tokens(&[TokenType::Comma]) {
             let operator = self.previous();
@@ -180,7 +180,7 @@ impl Parser {
     // do I need to insert this into comma?
     // do I need to insert this into ternary in place of equality?
     fn assignment(&mut self) -> Result<Box<Expr>, ParsingError> {
-        let expr = self.equality()?;
+        let expr = self.ternary()?;
 
         if self.match_tokens(&[TokenType::Equal]) {
             let equals = self.previous();
